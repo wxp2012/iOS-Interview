@@ -11,4 +11,4 @@
 * 用分类好，因为对分类去扩展实现方法，并不会对其他类与原有类的关系
 
 #### 2、"#import跟#include有什么区别，@class呢,#import<> 跟 #import”又有什么区别?"
-* 
+* import是Objective-C导入头文件的关键字，#include是c/c++导入头文件的关键字，使用#import头文件会自动导入一次，不会重复导入，相当于#include和#pragma once；@class告诉编译器某个类的声明，当执行时，才去查看类的实现文件，可以解决头文件的相互包含；#import<>用来包含系统的头文件，#import“”用来包含用户头文件。

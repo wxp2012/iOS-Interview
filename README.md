@@ -20,3 +20,30 @@
 * copy表示赋值特性，setter方法将传入对象赋值一份，需要生成一份新的变量时使用
 * nonatomic表示非原子操作，决定编译器生成的setter、getter是否是原子操作，atomic表示原子特性，表示多线程安全，通常在Mac开发中会使用，而nonatomic是在iOS开发中使用
 
+#### 4、写一个setter方法用于完成@property（nonatomic，retain）NSString *name，写一个setter方法用于完成@property（nonatomic，copy）NSString *name
+* —（void）setName:(NSString *)str 
+  
+  {  
+     [str retain];
+     
+     [name release];
+     
+     name = str;
+     
+     }
+* — (void) setName:(NSString *)str
+
+  {
+  
+     id t = [str copy];
+     
+     [name release];
+     
+     name = t;
+     
+   }
+   
+#### 5、对于语句 NNString *obj = [[NSData alloc] init]; obj在编译时和运行时分别是什么类型的对象？
+* 编译时是NSString的类型；运行时是NSData类型的对象
+
+#### 6、常见的object-c的数据类型有哪些，和C的基本数据类型有什么区别？如：NSInteger和Int

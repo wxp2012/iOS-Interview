@@ -12,3 +12,11 @@
 
 #### 2、"#import跟#include有什么区别，@class呢,#import<> 跟 #import”又有什么区别?"
 * import是Objective-C导入头文件的关键字，#include是c/c++导入头文件的关键字，使用#import头文件会自动导入一次，不会重复导入，相当于#include和#pragma once；@class告诉编译器某个类的声明，当执行时，才去查看类的实现文件，可以解决头文件的相互包含；#import<>用来包含系统的头文件，#import“”用来包含用户头文件。
+
+#### 3、属性readwrite、readonly、assign、retain、copy、nonatomic各是什么作用，在哪种情况下用？
+* readwrite是可读可写属性，需要生成getter方法和setter方法时使用
+* readonly是只读属性，只会生成getter方法，不会生成setter方法，当不希望属性在外部改变时使用
+* assign是赋值属性，setter方法将传入参数赋值给实例再赋值，传入参数retaincount会+1
+* copy表示赋值特性，setter方法将传入对象赋值一份，需要生成一份新的变量时使用
+* nonatomic表示非原子操作，决定编译器生成的setter、getter是否是原子操作，atomic表示原子特性，表示多线程安全，通常在Mac开发中会使用，而nonatomic是在iOS开发中使用
+

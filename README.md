@@ -47,3 +47,9 @@
 * 编译时是NSString的类型；运行时是NSData类型的对象
 
 #### 6、常见的object-c的数据类型有哪些，和C的基本数据类型有什么区别？如：NSInteger和Int
+* Object-C的数据类型有NSString，NSNumber，NSArray，NSMutableArray，NSData等等，这些都是类(class),创建后便是对象，而C语言的基本数据类型Int，只是拥有字节的内存空间，用于存放数值；NSInteger是基本数据类型，并不是NSNumber的子类，当然也不是NSObject的子类。NSInteger是基本数据类型Int或者long的别名(NSInteger的定义typedef long NSInteger)，它的区别在于，NSInteger会根据系统是32位还是64位来决定是本身Int还是long。
+
+#### 7、id 声明的对象有什么特性？
+* id声明的对象具有运行时的特性，即可以指向任意类型的objective-c的对象。
+
+#### 8、Objective-C如何对内存管理的，说说你的看法和解决方法？

@@ -121,3 +121,5 @@
 * 如果这个方法还是没有被实现的话，程序会抛出一个NSUndefinedKeyException异常错误。 (cocoachina.com注：Key-Value Coding查找方法的时候，不仅仅会查找someKey这个方法，还会查找getsomeKey这个方法，前面加一个get，或者_someKey以及_getsomeKey这几种形式。同时，查找实例变量的时候也会不仅仅查找someKey这个变量，也会查找_someKey这个变量是否存在。)设计valueForUndefinedKey:方法的主要目的是当你使用-(id)valueForKey方法从对象中请求值时，对象能够在错误发生前，有最后的机会响应这个请求。
 * 这样做有很多好处，下面的两个例子说明了这样做的好处。“来至cocoa，这个说法应该挺有道理。因为我们知道button却是存在一个highlighted实例变量.因此为何上面我们只是add一个相关的keypath就行了，可以按照kvc查找的逻辑理解，就说的过去了。
 
+#### 20、代理的作用？
+* 代理的目的是改变或传递控制链。允许一个类在某些特定时刻通知到其他类，而不需要获取到那些类的指针。可以减少框架复杂度。另外一点，代理可以理解为java中的回调监听机制的一种类似。

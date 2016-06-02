@@ -63,3 +63,13 @@
 * 1). atomic提供多线程安全。是防止在写未完成的时候被另外一个线程读取，造成数据错误
 * 2). nonatomic:在自己管理内存的环境中，解析的访问器保留并自动释放返回的值，如果指定了nonatomic ，那么访问器只是简单地返回这个值。
 
+#### 10、看下面的程序,第一个NSLog会输出什么?这时str的retainCount是多少?第二个和第三个呢? 为什么?
+* NSMutableArray* ary = [[NSMutableArray array] retain];
+ NSString *str = [NSString stringWithFormat:@\"test\"];
+  [str retain];
+ 
+[aryaddObject:str]; [str retain];
+ [str release];
+ [str release];  [aryremoveAllObjects];  str的retainCount创建+1，retain+1，加入数组自动+1 3 retain+1，release-1，release-1 2数组删除所有对象，所有数组内的对象自动-1 1
+#### 11、内存管理的几条原则时什么?按照默认法则。哪些关键字生成的对象需要手动释放?在和property结合的时候怎样有效的避免内存泄露?
+* 

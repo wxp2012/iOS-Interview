@@ -72,4 +72,6 @@
  [str release];
  [str release];  [aryremoveAllObjects];  str的retainCount创建+1，retain+1，加入数组自动+1 3 retain+1，release-1，release-1 2数组删除所有对象，所有数组内的对象自动-1 1
 #### 11、内存管理的几条原则时什么?按照默认法则。哪些关键字生成的对象需要手动释放?在和property结合的时候怎样有效的避免内存泄露?
-* 
+* 谁申请，谁释放遵循Cocoa Touch的使用原则;内存管理主要要避免“过早释放”和“内存泄漏”，对于“过早释放”需要注意@property设置特性时，一定要用对特性关键字，对于“内存泄漏”，一定要申请了要负责释放，要细心。关键字alloc 或new 生成的对象需要手动释放;设置正确的property属性，对于retain需要在合适的地方释放
+
+#### 12、

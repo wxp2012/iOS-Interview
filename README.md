@@ -74,4 +74,8 @@
 #### 11、内存管理的几条原则时什么?按照默认法则。哪些关键字生成的对象需要手动释放?在和property结合的时候怎样有效的避免内存泄露?
 * 谁申请，谁释放遵循Cocoa Touch的使用原则;内存管理主要要避免“过早释放”和“内存泄漏”，对于“过早释放”需要注意@property设置特性时，一定要用对特性关键字，对于“内存泄漏”，一定要申请了要负责释放，要细心。关键字alloc 或new 生成的对象需要手动释放;设置正确的property属性，对于retain需要在合适的地方释放
 
-#### 12、
+#### 12、如何对iOS设备进行性能测试?
+* Profile-> Instruments ->Time Profiler
+
+#### 13、Object-C中创建线程的方法有什么?如果在主线程中执行代码，方法是什么?如果想延时执行代码的方法又是什么?
+* 线程创建有三种方法：使用NSThread创建、使用GCD的dispatch、使用子类化的NSOperation,然后将其加入NSOperationQueue;在主线程执行代码，方法是performSelectorOnMainThread，如果想延时执行代码可以用performSelector:onThread:withObject:waitUntilDone:

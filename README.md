@@ -163,3 +163,122 @@
 #### 31、NSOperation queue?
 * 存放NSOperation的集合类。操作和操作队列，基本可以看成java中的线程和线程池的概念。用于处理ios多线程开发的问题。网上部分资料提到一点是，虽然是queue，但是却并不是带有队列的概念，放入的操作并非是按照严格的先进现出。这边又有个疑点是，对于队列来说，先进先出的概念是Afunc添加进队列，Bfunc紧跟着也进入队列，Afunc先执行这个是必然的，但是Bfunc是等Afunc完全操作完以后，B才开始启动并且执行，因此队列的概念离乱上有点违背了多线程处理这个概念。但是转念一想其实可以参考银行的取票和叫号系统。因此对于A比B先排队取票但是B率先执行完操作，我们亦然可以感性认为这还是一个队列。但是后来看到一票关于这操作队列话题的文章，其中有一句提到 “因为两个操作提交的时间间隔很近，线程池中的线程，谁先启动是不定的。”瞬间觉得这个queue名字有点忽悠人了，还不如pool~综合一点，我们知道他可以比较大的用处在于可以帮组多线程编程就好了。
 
+#### 32、什么是延迟加载？
+* 懒汉模式，只在用到的时候才去初始化。也可以理解成延时加载。我觉得最好也最简单的一个列子就是tableView中图片的加载显示了。一个延时载，避免内存过高，一个异步加载，避免线程堵塞。
+
+#### 33、是否在一个视图控制器中嵌入两个tableview控制器?
+* 一个视图控制只提供了一个View视图，理论上一个tableViewController也不能放吧，只能说可以嵌入一个tableview视图。当然，题目本身也有歧义，如果不是我们定性思维认为的UIViewController，而是宏观的表示视图控制者，那我们倒是可以把其看成一个视图控制者，它可以控制多个视图控制器，比如TabbarController那样的感觉。
+
+#### 34、一个tableView是否可以关联两个不同的数据源?你会怎么处理?
+* 首先我们从代码来看，数据源如何关联上的，其实是在数据源关联的代理方法里实现的。因此我们并不关心如何去关联他，他怎么关联上，方法只是让我返回根据自己的需要去设置如相关的数据源。因此，我觉得可以设置多个数据源啊，但是有个问题是，你这是想干嘛呢?想让列表如何显示，不同的数据源分区块显示?"  (不可以，在同一个数据源下可以指向不同的tableview指针就行)
+
+#### 35、什么时候使用NSMutableArray，什么时候使用NSArray?
+* 当数组在程序运行时，需要不断变化的，使用NSMutableArray，当数组在初始化后，便不再改变的，使用NSArray。需要指出的是，使用NSArray只表明的是该数组在运行时不发生改变，即不能往NSAarry的数组里新增和删除元素，但不表明其数组內的元素的内容不能发生改变。NSArray是线程安全的，NSMutableArray不是线程安全的，多线程使用到NSMutableArray需要注意。
+
+#### 36、给出委托方法的实例，并且说出UITableVIew的Data Source方法
+* CocoaTouch框架中用到了大量委托，其中UITableViewDelegate就是委托机制的典型应用，是一个典型的使用委托来实现适配器模式，其中UITableViewDelegate协议是目标，tableview是适配器，实现UITableViewDelegate协议，并将自身设置为talbeview的delegate的对象，是被适配器，一般情况下该对象是UITableViewController。UITableVIew的Data Source方法有
+
+* -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
+
+* -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
+
+#### 37、如果我们不创建内存池，是否有内存池提供给我们?
+* 界面线程维护着自己的内存池，用户自己创建的数据线程，则需要创建该线程的内存池
+
+#### 38、什么时候需要在程序中创建内存池?
+* 用户自己创建的数据线程，则需要创建该线程的内存池
+
+#### 39、类NSObject的那些方法经常被使用?
+* NSObject是Objetive-C的基类，其由NSObject类及一系列协议构成。其中类方法alloc、class、 description 对象方法init、dealloc、– performSelector:withObject:afterDelay:等经常被使用
+
+#### 40、什么是简便构造方法?
+* 简便构造方法一般由CocoaTouch框架提供，如NSNumber的 + numberWithBool: + numberWithChar: + numberWithDouble: + numberWithFloat: + numberWithInt: Foundation下大部分类均有简便构造方法，我们可以通过简便构造方法，获得系统给我们创建好的对象，并且不需要手动释放。
+
+#### 41、如何使用Xcode设计通用应用?
+* 使用MVC模式设计应用，其中Model层完成脱离界面，即在Model层，其是可运行在任何设备上，在controller层，根据iPhone与iPad(独有UISplitViewController)的不同特点选择不同的viewController对象。在View层，可根据现实要求，来设计，其中以xib文件设计时，其设置其为universal。
+
+#### 42、UIView的动画效果有那些?
+* 有很多，如 
+UIViewAnimationOptionCurveEaseInOut UIViewAnimationOptionCurveEaseIn UIViewAnimationOptionCurveEaseOut UIViewAnimationOptionTransitionFlipFromLeft UIViewAnimationOptionTransitionFlipFromRight UIViewAnimationOptionTransitionCurl
+UpUIViewAnimationOptionTransitionCurlDown
+
+#### 43、在iPhone应用中如何保存数据?
+* 有以下几种保存机制： 
+* 1).通过web服务，保存在服务器上
+* 2).通过NSCoder固化机制，将对象保存在文件中
+* 3).通过SQlite或CoreData保存在文件数据库中
+
+#### 44、什么是NSManagedObject模型?
+* NSManagedObject是NSObject的子类 ，也是CoreData的重要组成部分，它是一个通用的类,实现了Core Data 模型层所需的基本功能，用户可通过子类化NSManagedObject，建立自己的数据模型
+
+#### 45、什么是CoreData?
+* CoreData是苹果提供一套数据保存框架，其基于SQlite
+
+#### 46、什么是NSManagedobjectContext?
+* NSManagedobjectContext对象负责应用和数据库之间的交互
+
+#### 47、什么是谓词?
+* 谓词是通过NSPredicate，是通过给定的逻辑条件作为约束条件，完成对数据的筛选。
+
+predicate = [NSPredicate predicateWithFormat:@"customerID == %d",n];
+
+a = [customers filteredArrayUsingPredicate:predicate];
+
+#### 48、和CoreData一起有哪几种持久化存储机制?
+* 存入到文件、 存入到NSUserDefaults(系统plist文件中)、存入到Sqlite文件数据库
+
+#### 49、谈谈对Block 的理解?并写出一个使用Block执行UIVew动画?
+* Block是可以获取其他函数局部变量的匿名函数，其不但方便开发，并且可以大幅提高应用的执行效率(多核心CPU可直接处理Block指令) 
+
+[UIView transitionWithView:self.view duration:0.2 options:UIViewAnimationOptionTransitionFlipFromLeft animations:^{ 
+
+[[blueViewController view] removeFromSuperview]; 
+
+[[self view] insertSubview:yellowViewController.view atIndex:0];
+
+ } completion:NULL];
+ 
+#### 50、做过的项目是否涉及网络访问功能，使用什么对象完成网络功能?
+*ASIHTTPRequest与NSURLConnection  AFNetworking中的AFHTTPSessionManager
+
+#### 51、简单介绍下NSURLConnection类及+ sendSynchronousRequest:returningResponse:error:与– initWithRequest:delegate:两个方法的区别?
+* NSURLConnection主要用于网络访问，其中+ sendSynchronousRequest:returningResponse:error:是同步访问数据，即当前线程会阻塞，并等待request的返回的response，而– initWithRequest:delegate:使用的是异步加载，当其完成网络访问后，会通过delegate回到主线程，并其委托的对象。
+
+#### 52、多线程是什么？
+* 多线程是个复杂的概念，按字面意思是同步完成多项任务，提高了资源的使用效率，从硬件、操作系统、应用软件不同的角度去看，多线程被赋予不同的内涵，对于硬件，现在市面上多数的CPU都是多核的，多核的CPU运算多线程更为出色;从操作系统角度，是多任务，现在用的主流操作系统都是多任务的，可以一边听歌、一边写博客;对于应用来说，多线程可以让应用有更快的回应，可以在网络下载时，同时响应用户的触摸操作。在iOS应用中，对多线程最初的理解，就是并发，它的含义是原来先做烧水，再摘菜，再炒菜的工作，会变成烧水的同时去摘菜，最后去炒菜。
+
+#### 53、iOS中的多线程有哪些？
+* iOS中的多线程，是Cocoa框架下的多线程，通过Cocoa的封装，可以让我们更为方便的使用线程，做过C++的同学可能会对线程有更多的理解，比如线程的创立，信号量、共享变量有认识，Cocoa框架下会方便很多，它对线程做了封装，有些封装，可以让我们创建的对象，本身便拥有线程，也就是线程的对象化抽象，从而减少我们的工程，提供程序的健壮性。GCD是(Grand Central Dispatch)的缩写 ，从系统级别提供的一个易用地多线程类库，具有运行时的特点，能充分利用多核心硬件。GCD的API接口为C语言的函数，函数参数中多数有Block，关于Block的使用参看这里，为我们提供强大的“接口”，对于GCD的使用参见本文NSOperation与QueueNSOperation是一个抽象类，它封装了线程的细节实现，我们可以通过子类化该对象，加上NSQueue来同面向对象的思维，管理多线程程序。具体可参看这里：一个基于NSOperation的多线程网络访问的项目。NSThread NSThread是一个控制线程执行的对象，它不如NSOperation抽象，通过它我们可以方便的得到一个线程，并控制它。但NSThread的线程之间的并发控制，是需要我们自己来控制的，可以通过NSCondition实现。参看 iOS多线程编程之NSThread的使用其他多线程在Cocoa的框架下，通知、Timer和异步函数等都有使用多线程)
+
+#### 54、在项目什么时候选择使用GCD，什么时候选择NSOperation?
+* 项目中使用NSOperation的优点是NSOperation是对线程的高度抽象，在项目中使用它，会使项目的程序结构更好，子类化NSOperation的设计思路，是具有面向对象的优点(复用、封装)，使得实现是多线程支持，而接口简单，建议在复杂项目中使用。项目中使用GCD的优点是GCD本身非常简单、易用，对于不复杂的多线程操作，会节省代码量，而Block参数的使用，会是代码更为易读，建议在简单项目中使用。
+
+#### 55、什么是block?
+* 对于闭包(block),有很多定义，其中闭包就是能够读取其它函数内部变量的函数，这个定义即接近本质又较好理解。对于刚接触Block的同学，会觉得有些绕，因为我们习惯写这样的程序main(){ funA();} funA(){funB();} funB(){…..}; 就是函数main调用函数A，函数A调用函数B… 函数们依次顺序执行，但现实中不全是这样的，例如项目经理M，手下有3个程序员A、B、C，当他给程序员A安排实现功能F1时，他并不等着A完成之后，再去安排B去实现F2，而是安排给A功能F1，B功能F2，C功能F3，然后可能去写技术文档，而当A遇到问题时，他会来找项目经理M，当B做完时，会通知M，这就是一个异步执行的例子。在这种情形下，Block便可大显身手，因为在项目经理M，给A安排工作时，同时会告诉A若果遇到困难，如何能找到他报告问题(例如打他手机号)，这就是项目经理M给A的一个回调接口，要回掉的操作，比如接到电话，百度查询后，返回网页内容给A，这就是一个Block，在M交待工作时，已经定义好，并且取得了F1的任务号(局部变量)，却是在当A遇到问题时，才调用执行，跨函数在项目经理M查询百度，获得结果后回调该block。
+
+#### 56、多线程与block
+* GCD与Block使用 dispatch_async 系列方法，可以以指定的方式执行block GCD编程实例dispatch_async的完整定义void dispatch_async(dispatch_queue_t queue,dispatch_block_t block);
+* 功能：在指定的队列里提交一个异步执行的block，不阻塞当前线程通过queue来控制block执行的线程。主线程执行前文定义的 finishBlock对象dispatch_async(dispatch_get_main_queue(),^(void){finishBlock();});
+
+#### 57、使用block和使用delegate完成委托模式有什么优点?
+* 首先要了解什么是委托模式，委托模式在iOS中大量应用，其在设计模式中是适配器模式中的对象适配器，Objective-C中使用id类型指向一切对象，使委托模式更为简洁。了解委托模式的细节：iOS设计模式—-委托模式使用block实现委托模式，其优点是回调的block代码块定义在委托对象函数内部，使代码更为紧凑;适配对象不再需要实现具体某个protocol，代码更为简洁。
+
+#### 58、block实现原理？
+* Objective-C是对C语言的扩展，block的实现是基于指针和函数指针。从计算语言的发展，最早的goto，高级语言的指针，到面向对象语言的block，从机器的思维，一步步接近人的思维，以方便开发人员更为高效、直接的描述出现实的逻辑(需求)。使用实例cocoaTouch框架下动画效果的Block的调用使用typed声明block typedef void(^didFinishBlock) (NSObject *ob);这就声明了一个didFinishBlock类型的block，然后便可用@property (nonatomic,copy) didFinishBlock finishBlock;声明一个blokc对象，注意对象属性设置为copy，接到block 参数时，便会自动复制一份。__block是一种特殊类型，使用该关键字声明的局部变量，可以被block所改变，并且其在原函数中的值会被改变。
+
+#### 59、谈谈Object-C的内存管理方式及过程？
+* 1).当你使用new,alloc和copy方法创建一个对象时,该对象的保留计数器值为1.当你不再使用该对象时,你要负责向该对象发送一条release或autorelease消息.这样,该对象将在使用寿命结束时被销毁。 
+* 2).当你通过任何其他方法获得一个对象时,则假设该对象的保留计数器值为1,而且已经被设置为自动释放,你不需要执行任何操作来确保该对象被清理.如果你打算在一段时间内拥有该对象,则需要保留它并确保在操作完成时释放它。 
+* 3).如果你保留了某个对象,你需要(最终)释放或自动释放该对象.必须保持retain方法和release方法的使用次数相等。
+
+#### 60、Object-C有私有方法吗？私有变量呢？
+* Objective-C – 类里面的方法只有两种, 静态方法和实例方法. 这似乎就不是完整的面向对象了,按照OO的原则就是一个对象只暴露有用的东西. 如果没有了私有方法的话, 对于一些小范围的代码重用就不那么顺手了. 在类里面声名一个私有方法
+* @interface Controller : NSObject { NSString *something; }+ (void)thisIsAStaticMethod;– (void)thisIsAnInstanceMethod;@end@interface Controller (private) -(void)thisIsAPrivateMethod;@end@private
+* 可以用来修饰私有变量在Objective‐C中，所有实例变量默认都是私有的，所有实例方法默认都是公有的
+
+#### 61、内存管理 Autorelease、retain、copy、assign的set方法和含义？
+* 1).你初始化(alloc\/init)的对象，你需要释放(release)它。例如： NSMutableArray aArray = [[NSArray alloc] init]; 后，需要 [aArray release];  
+* 2).你retain或copy的，你需要释放它。例如： [aArray retain] 后，需要 [aArray release];  
+* 3).被传递(assign)的对象，你需要斟酌的retain和release。例如： obj2 = [[obj1 someMethod] autorelease];对象2接收对象1的一个自动释放的值，或传递一个基本数据类型(NSInteger，NSString)时：你或希望将对象2进行retain，以防止它在被使用之前就被自动释放掉。但是在retain后，一定要在适当的时候进行释放。关于索引计数(Reference Counting)的问题retain值 = 索引计数(Reference Counting) NSArray对象会retain(retain值加一)任何数组中的对象。当NSArray被卸载(dealloc)的时候，所有数组中的对象会 被 执行一次释放(retain值减一)。不仅仅是NSArray，任何收集类(Collection Classes)都执行类似操作。例如 NSDictionary，甚至UINavigationController。Alloc\/init建立的对象，索引计数为1。无需将其再次retain。 [NSArray array]和[NSDate date]等“方法”建立一个索引计数为1的对象，但是也是一个自动释放对象。所以是本地临时对象，那么无所谓了。如果是打算在全Class中使用的变量(iVar)，则必须retain它。缺省的类方法返回值都被执行了“自动释放”方法。(*如上中的NSArray)在类中的卸载方法“dealloc”中，release所有未被平衡的NS对象。(*所有未被autorelease，而retain值为1的)
+
+#### 62、Objective-C有多继承吗？没有的话用什么代替？cocoa 中所有的类都是NSObject 的子类

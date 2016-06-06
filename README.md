@@ -575,7 +575,134 @@ a = [customers filteredArrayUsingPredicate:predicate];
 * 2.并行队列Concurrent Dispatch Queue
 
 #### 128、使用系统的某些block api（如UIView的block版本写动画时），是否也考虑引用循环问题？
-* "系统的某些block api中，UIView的block版本写动画时不需要考虑，但也有一些api 需要考虑：所谓“引用循环”是指双向的强引用，所以那些“单向的强引用”（block 强引用 self ）没有问题，比如这些： [UIView animateWithDuration:duration animations:^{ [self.superview layoutIfNeeded]; }]; [[NSOperationQueue mainQueue] addOperationWithBlock:^{ self.someProperty = xyz; }]; [[NSNotificationCenter defaultCenter] addObserverForName:@\"someNotification\"                                                  object:nil                           queue:[NSOperationQueue mainQueue]                                              usingBlock:^(NSNotification * notification) {                                                    self.someProperty = xyz; }];这些情况不需要考虑“引用循环”。但如果你使用一些参数中可能含有 ivar 的系统 api ，如 GCD 、NSNotificationCenter就要小心一点：比如GCD 内部如果引用了 self，而且 GCD 的其他参数是 ivar，则要考虑到循环引用： __weak __typeof__(self) weakSelf = self; dispatch_group_async(_operationsGroup, _operationsQueue, ^ { __typeof__(self) strongSelf = weakSelf;[strongSelf doSomething];[strongSelf doSomethingElse];} );类似的： __weak __typeof__(self) weakSelf = self;  _observer = [[NSNotificationCenter defaultCenter] addObserverForName:@\"testKey\"                                                                object:nil                                                                 queue:nil                                                            usingBlock:^(NSNotification *note) {      __typeof__(self) strongSelf = weakSelf;      [strongSelf dismissModalViewControllerAnimated:YES];  }];self --> _observer --> block --> self 显然这也是一个循环引用。"
+* "系统的某些block api中，UIView的block版本写动画时不需要考虑，但也有一些api 需要考虑：所谓“引用循环”是指双向的强引用，所以那些“单向的强引用”（block 强引用 self ）没有问题，比如这些： 
+* [UIView animateWithDuration:duration animations:^{ [self.superview layoutIfNeeded]; }]; [[NSOperationQueue mainQueue] addOperationWithBlock:^{ self.someProperty = xyz; }]; 
+* [[NSNotificationCenter defaultCenter] addObserverForName:@"someNotification"                                                  object:nil                           queue:[NSOperationQueue mainQueue]                                              usingBlock:^(NSNotification * notification) {                                                    self.someProperty = xyz; }];
+* 这些情况不需要考虑“引用循环”。但如果你使用一些参数中可能含有 ivar 的系统 api ，如 GCD 、NSNotificationCenter就要小心一点：比如GCD 内部如果引用了 self，而且 GCD 的其他参数是 ivar，则要考虑到循环引用： __weak __typeof__(self) weakSelf = self; dispatch_group_async(_operationsGroup, _operationsQueue, ^ { __typeof__(self) strongSelf = weakSelf;[strongSelf doSomething];[strongSelf doSomethingElse];} );
+* 类似的： __weak __typeof__(self) weakSelf = self;  _observer = [[NSNotificationCenter defaultCenter] addObserverForName:@"testKey"                                                                object:nil                                                                 queue:nil                                                            usingBlock:^(NSNotification *note) {      __typeof__(self) strongSelf = weakSelf;      [strongSelf dismissModalViewControllerAnimated:YES];  }];
+* self --> _observer --> block --> self 显然这也是一个循环引用。"
+
+#### 129、在block内如何修改block外部变量？
+* 默认情况下，在block中访问的外部变量是复制过去的，即：写操作不对原变量生效。但是你可以加上__block来让其写操作生效，示例代码如下:
+* __block int a = 0;
+* void  (^foo)(void) = ^{     a = 1; }f00(); //这里，a的值被修改为1
+
+#### 130、使用block时什么情况会发生引用循环，如何解决？
+* 一个对象中强引用了block，在block中又使用了该对象，就会发射循环引用。 解决方法是将该对象使用__weak或者__block修饰符修饰之后再在block中使用。id weak weakSelf = self; 或者 weak __typeof(&*self)weakSelf = self该方法可以设置宏id __block weakSelf = self;
+
+#### 131、苹果是如何实现autoreleasepool的？
+* autoreleasepool以一个队列数组的形式实现,主要通过下列三个函数完成.nobjc_autoreleasepoolPush objc_autoreleasepoolPop objc_aurorelease 看函数名就可以知道，对autorelease分别执行push，和pop操作。销毁对象时执行release操作。
+
+#### 132、BAD_ACCESS在什么情况下出现？
+* 访问了野指针，比如对一个已经释放的对象执行了release、访问已经释放对象的成员变量或者发消息。死循环
+
+#### 133、不手动指定autoreleasepool的前提下，一个autorealese对象在什么时刻释放？（比如在一个vc的viewDidLoad中创建）
+* 分两种情况：手动干预释放时机、系统自动去释放。手动干预释放时机--指定autoreleasepool 就是所谓的：当前作用域大括号结束时释放。系统自动去释放--不手动指定autoreleasepool Autorelease对象会在当前的 runloop 迭代结束时释放。如果在一个vc的viewDidLoad中创建一个 Autorelease对象，那么该对象会在 viewDidAppear 方法执行前就被销毁了。
+
+#### 134、ARC通过什么方式帮助开发者管理内存？
+* 编译时根据代码上下文，插入 retain/release
+
+#### 135、Objc使用什么机制管理对象内存？
+* 通过 retainCount 的机制来决定对象是否需要释放。 每次 runloop 的时候，都会检查对象的 retainCount，如果retainCount 为 0，说明该对象没有地方需要继续使用了，可以释放掉了。
+
+#### 136、猜想runloop内部是如何实现的？
+* 一般来讲，一个线程一次只能执行一个任务，执行完成后线程就会退出。如果我们需要一个机制，让线程能随时处理事件但并不退出，通常的代码逻辑 是这样的：
+* function loop() 
+
+{
+    initialize();    
+    
+    do 
+    
+    {        
+    
+            var message = get_next_message();
+    
+            process_message(message); 
+            
+               } 
+               
+               while (message != quit);
+               
+               }
+               
+或使用伪代码来展示下:
+
+int main(int argc, char * argv[]) {
+
+程序一直运行状态 while (AppIsRunning) 
+
+{     
+
+//睡眠状态，等待唤醒事件     id whoWakesMe = SleepForWakingUp();
+
+//得到唤醒事件     id event = GetEvent(whoWakesMe);
+
+//开始处理事件      HandleEvent(event); 
+
+}return 0;
+
+}
+
+#### 137、以+ scheduledTimerWithTimeInterval...的方式触发的timer，在滑动页面上的列表时，timer会暂定回调，为什么？如何解决？
+* RunLoop只能运行在一种mode下，如果要换mode，当前的loop也需要停下重启成新的。利用这个机制，ScrollView滚动过程中NSDefaultRunLoopMode（kCFRunLoopDefaultMode）的mode会切换到UITrackingRunLoopMode来保证ScrollView的流畅滑动：只能在NSDefaultRunLoopMode模式下处理的事件会影响scrllView的滑动。如果我们把一个NSTimer对象以NSDefaultRunLoopMode（kCFRunLoopDefaultMode）添加到主运行循环中的时候, ScrollView滚动过程中会因为mode的切换，而导致NSTimer将不再被调度。同时因为mode还是可定制的，所以： Timer计时会被scrollView的滑动影响的问题可以通过将timer添加到NSRunLoopCommonModes（kCFRunLoopCommonModes）来解决。
+* 代码如下：
+* 将timer添加到NSDefaultRunLoopMode中[NSTimer scheduledTimerWithTimeInterval:1.0     target:self    selector:@selector(timerTick:)     userInfo:nil     repeats:YES];
+* //然后再添加到NSRunLoopCommonModes里NSTimer *timer = [NSTimer timerWithTimeInterval:1.0     target:self     selector:@selector(timerTick:)     userInfo:nil     repeats:YES];
+* [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+
+#### 138、runloop的mode作用是什么？
+* model 主要是用来指定事件在运行循环中的优先级的，分为：
+* NSDefaultRunLoopMode（kCFRunLoopDefaultMode）：默认， 空闲状态
+* UITrackingRunLoopMode： ScrollView滑动时
+* UIInitializationRunLoopMode： 启动时
+* NSRunLoopCommonModes（kCFRunLoopCommonModes）：Mode集合
+* 苹果公开提供的 Mode 有两个：NSDefaultRunLoopMode（kCFRunLoopDefaultMode）NSRunLoopCommonModes（kCFRunLoopCommonModes）
+
+#### 139、runloop和线程有什么关系？
+* 总的说来，Run loop，正如其名，loop表示某种循环，和run放在一起就表示一直在运行着的循环。实际上，run loop和线程是紧密相连的，可以这样说run loop是为了线程而生，没有线程，它就没有存在的必要。Run loops是线程的基础架构部分， Cocoa 和 CoreFundation 都提供了 run loop 对象方便配置和管理线程的 run loop （以下都以 Cocoa 为例）。每个线程，包括程序的主线程（ main thread ）都有与之相应的 run loop 对象。
+* runloop 和线程的关系： 
+* 1、主线程的run loop默认是启动的。iOS的应用程序里面，程序启动后会有一个如下的main()函数int main(int argc, char * argv[]) {@autoreleasepool {    return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));}}重点是UIApplicationMain()函数，这个方法会为main thread设置一个NSRunLoop对象，这就解释了：为什么我们的应用可以在无人操作的时候休息，需要让它干活的时候又能立马响应。
+* 2、对其它线程来说，run loop默认是没有启动的，如果你需要更多的线程交互则可以手动配置和启动，如果线程只是去执行一个长时间的已确定的任务则不需要。
+* 3、在任何一个 Cocoa 程序的线程中，都可以通过以下代码来获取到当前线程的 run loop 。NSRunLoop *runloop = [NSRunLoop currentRunLoop];
+
+#### 140、能否向编译后得到的类中增加实例变量？能否向运行时创建的类中添加实例变量？为什么？
+* 不能向编译后得到的类中增加实例变量；能向运行时创建的类中添加实例变量；解释下：因为编译后的类已经注册在 runtime 中，类结构体中的 objc_ivar_list 实例变量的链表 和 instance_size 实例变量的内存大小已经确定，同时runtime 会调用 class_setIvarLayout 或 class_setWeakIvarLayout 来处理 strong weak 引用。所以不能向存在的类中添加实例变量；运行时创建的类是可以添加实例变量，调用 class_addIvar 函数。但是得在调用 objc_allocateClassPair 之后，objc_registerClassPair 之前，原因同上。
+
+#### 141、runtime如何实现weak变量的自动置nil？
+* runtime 对注册的类， 会进行布局，对于 weak 对象会放入一个 hash 表中。 用 weak 指向的对象内存地址作为 key，当此对象的引用计数为0的时候会 dealloc，假如 weak 指向的对象内存地址是a，那么就会以a为键， 在这个 weak 表中搜索，找到所有以a为键的 weak 对象，从而设置为 nil。
+
+#### 142、_objc_msgForward函数是做什么的，直接调用它将会发生什么？
+* _objc_msgForward是 IMP 类型，用于消息转发的：当向一个对象发送一条消息，但它并没有实现的时候，_objc_msgForward会尝试做消息转发。
+
+#### 143、Objc中的类方法和实例方法有什么本质区别和联系？
+* 类方法：类方法是属于类对象的 类方法只能通过类对象调用 类方法中的self是类对象 类方法可以调用其他的类方法 类方法中不能访问成员变量 类方法中不定直接调用对象方法 实例方法：实例方法是属于实例对象的 实例方法只能通过实例对象调用 实例方法中的self是实例对象 实例方法中可以访问成员变量 实例方法中直接调用实例方法 实例方法中也可以调用类方法(通过类名)
+
+#### 144、使用runtime Associate方法关联的对象，需要在主对象dealloc的时候释放么？
+* 无论在MRC下还是ARC下均不需要 对象的内存销毁时间表，分四个步骤： // 对象的内存销毁时间表中发布的内存销毁时间表  
+* 1.调用 -release ：引用计数变为零     * 对象正在被销毁，生命周期即将结束.     * 不能再有新的 __weak 弱引用， 否则将指向 nil.     * 调用 [self dealloc]  
+* 2.父类 调用 -dealloc     * 继承关系中最底层的父类 在调用 -dealloc     * 如果是 MRC 代码 则会手动释放实例变量们（iVars）     * 继承关系中每一层的父类 都在调用 –dealloc  
+* 3.NSObject 调 -dealloc     * 只做一件事：调用 Objective-C runtime 中的 object_dispose() 方法 
+* 4.调用 object_dispose()     * 为 C++ 的实例变量们（iVars）调用 destructors      * 为 ARC 状态下的 实例变量们（iVars） 调用 -release      * 解除所有使用 runtime Associate方法关联的对象     * 解除所有 __weak 引用     * 调用 free()
+
+#### 145、runtime如何通过selector找到对应的IMP地址？（分别考虑类方法和实例方法）
+* 每一个类对象中都一个方法列表,方法列表中记录着方法的名称,方法实现,以及参数类型,其实selector本质就是方法名称,通过这个方法名称就可以在方法列表中找到对应的方法实现
+
+#### 146、一个objc对象的isa的指针指向什么？有什么作用？
+* 指向他的类对象,从而可以找到对象上的方法
+
+#### 147、一个objc对象如何进行内存布局？（考虑有父类的情况）
+* 所有父类的成员变量和自己的成员变量都会存放在该对象所对应的存储空间中. 每一个对象内部都有一个isa指针,指向他的类对象,类对象中存放着本对象的
+* 1）对象方法列表（对象能够接收的消息列表，保存在它所对应的类对象中）
+* 2）成员变量的列表3）属性列表 它内部也有一个isa指针指向元对象(meta class),元对象内部存放的是类方法列表,类对象内部还有一个superclass的指针,指向他的父类对象。
+* 1）根对象就是NSobject，它的superclass指针指向nil。
+* 2）类对象既然称为对象，那它也是一个实例。类对象中也有一个isa指针指向它的元类(meta class)，即类对象是元类的实例。元类内部存放的是类方法列表，根元类的isa指针指向自己，superclass指针指向NSObject类。
+
+#### 148、什么时候会报unrecognized selector的异常？
+* 简单来说：当该对象上某个方法,而该对象上没有实现这个方法的时候， 可以通过“消息转发”进行解决。简单的流程如下，在上一题中也提到过：objc是动态语言，每个方法在运行时会被动态转为消息发送，即：objc_msgSend(receiver, selector)。objc在向一个对象发送消息时，runtime库会根据对象的isa指针找到该对象实际所属的类，然后在该类中的方法列表以及其父类方法列表中寻找方法运行，如果，在最顶层的父类中依然找不到相应的方法时，程序在运行时会挂掉并抛出异常unrecognized selector sent to XXX 。但是在这之前，objc的运行时会给出三次拯救程序崩溃的机会： Method resolution objc运行时会调用+resolveInstanceMethod:或者 +resolveClassMethod:，让你有机会提供一个函数实现。如果你添加了函数并返回 YES，那运行时系统就会重新启动一次消息发送的过程，如果 resolve 方法返回 NO ，运行时就会移到下一步，消息转发（Message Forwarding）。Fast forwarding如果目标对象实现了-forwardingTargetForSelector:，Runtime 这时就会调用这个方法，给你把这个消息转发给其他对象的机会。 只要这个方法返回的不是nil和self，整个消息发送的过程就会被重启，当然发送的对象会变成你返回的那个对象。否则，就会继续Normal Fowarding。 这里叫Fast，只是为了区别下一步的转发机制。因为这一步不会创建任何新的对象，但下一步转发会创建一个NSInvocation对象，所以相对更快点。Normal forwarding这一步是Runtime最后一次给你挽救的机会。首先它会发送-methodSignatureForSelector:消息获得函数的参数和返回值类型。如果-methodSignatureForSelector:返回nil，Runtime则会发出-doesNotRecognizeSelector:消息，程序这时也就挂掉了。如果返回了一个函数签名，Runtime就会创建一个NSInvocation对象并发送-forwardInvocation:消息给目标对象。
+
+
+
 
 
 

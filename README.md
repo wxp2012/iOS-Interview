@@ -451,6 +451,141 @@ a = [customers filteredArrayUsingPredicate:predicate];
 #### 100、动画有基本类型有哪几种；表视图有哪几种基本样式?
 * 动画有两种基本类型：隐式动画和显式动画。
 
+#### 101、实现简单的表格显示需要设置UITableView的什么属性、实现什么协议？
+* 实现简单的表格显示需要设置 UITableView 的 dataSource 和 delegate 属性，实现UITableViewDataSource 和 UITableViewDelegate 协议。
+
+#### 102、Cocoa Touch提供了哪几种Core Animation过渡类型？
+* Cocoa Touch 提供了4 种 Core Animation 过渡类型，分别为：交叉淡化、推挤、显示和覆盖。
+
+#### 103、UIView与CALayer有什么区别？
+* 1).UIView 是 iOS 系统中界面元素的基础，所有的界面元素都是继承自它。它本身完全是由 CoreAnimation 来实现的。它真正的绘图部分，是由一个 CALayer 类来管理。 UIView 本身更像是一个 CALayer 的管理器，访问它的跟绘图和跟坐标有关的属性。
+* 2).UIView 有个重要属性 layer ，可以返回它的主 CALayer 实例。
+* 3).UIView 的 CALayer 类似 UIView 的子 View 树形结构，也可以向它的 layer 上添加子layer ，来完成某些特殊的表示。即 CALayer 层是可以嵌套的。
+* 4).UIView 的 layer 树形在系统内部，被维护着三份 copy 。分别是逻辑树，这里是代码可以操纵的；动画树，是一个中间层，系统就在这一层上更改属性，进行各种渲染操作；显示树，其内容就是当前正被显示在屏幕上得内容。
+* 5).动画的运作：对 UIView 的 subLayer （非主 Layer ）属性进行更改，系统将自动进行动画生成，动画持续时间的缺省值似乎是 0.5 秒。
+* 6).坐标系统： CALayer 的坐标系统比 UIView 多了一个 anchorPoint 属性，使用CGPoint 结构表示，值域是 0~1 ，是个比例值。这个点是各种图形变换的坐标原点，同时会更改 layer 的 position 的位置，它的缺省值是 {0.5,0.5} ，即在 layer 的中央。
+* 7).渲染：当更新层，改变不能立即显示在屏幕上。当所有的层都准备好时，可以调用setNeedsDisplay 方法来重绘显示。
+* 8).变换：要在一个层中添加一个 3D 或仿射变换，可以分别设置层的 transform 或affineTransform 属性。
+* 9).变形： Quartz Core 的渲染能力，使二维图像可以被自由操纵，就好像是三维的。图像可以在一个三维坐标系中以任意角度被旋转，缩放和倾斜。 CATransform3D 的一套方法提供了一些魔术般的变换效果。
+
+#### 104、Quatrz 2D的绘图功能的三个核心概念是什么并简述其作用
+* 上下文：主要用于描述图形写入哪里；路径：是在图层上绘制的内容；状态：用于保存配置变换的值、填充和轮廓， alpha 值等。
+
+#### 105、iPhone OS主要提供了几种播放音频的方法？
+* SystemSound Services AVAudioPlayer 类Audio Queue Services OpenAL
+
+#### 106、使用AVAudioPlayer类调用哪个框架、使用步骤？
+* AVFoundation.framework步骤：配置 AVAudioPlayer 对象；实现 AVAudioPlayer 类的委托方法；控制 AVAudioPlayer 类的对象；监控音量水平；回放进度和拖拽播放。
+
+#### 107、有哪几种手势通知方法、写清楚方法名？
+* -(void)touchesBegan:(NSSet*)touchedwithEvent:(UIEvent*)event;
+* -(void)touchesMoved:(NSSet*)touched withEvent:(UIEvent*)event;
+* -(void)touchesEnded:(NSSet*)touchedwithEvent:(UIEvent*)event;
+* -(void)touchesCanceled:(NSSet*)touchedwithEvent:(UIEvent*)event;
+
+#### 108、CFSocket使用有哪几个步骤?
+* 创建 Socket 的上下文；创建 Socket ；配置要访问的服务器信息；封装服务器信息；连接服务器；
+
+#### 109、Core Foundation中提供了哪几种操作Socket的方法？
+* CFNetwork 、 CFSocket 和 BSD Socket 。
+
+#### 110、解析XML文件有哪几种方式？
+* 以 DOM 方式解析 XML 文件；以 SAX 方式解析 XML 文件
+
+#### 111、iOS平台怎么做数据的持久化?CoreData 和sqlite有无必然联系？CoreData是一个关系型数据库吗？
+* iOS 中可以有四种持久化数据的方式：属性列表(plist)、对象归档、 SQLite3 和 Core Data； core data 可以使你以图形界面的方式快速的定义 app 的数据模型，同时在你的代码中容易获取到它。 coredata 提供了基础结构去处理常用的功能，例如保存，恢复，撤销和重做，允许你在 app 中继续创建新的任务。在使用 core data 的时候，你不用安装额外的数据库系统，因为 core data 使用内置的 sqlite 数据库。 core data 将你 app 的模型层放入到一组定义在内存中的数据对象。 coredata 会追踪这些对象的改变，同时可以根据需要做相反的改变，例如用户执行撤销命令。当 core data 在对你 app 数据的改变进行保存的时候， core data 会把这些数据归档，并永久性保存。 mac os x 中sqlite 库，它是一个轻量级功能强大的关系数据引擎，也很容易嵌入到应用程序。可以在多个平台使用， sqlite 是一个轻量级的嵌入式 sql 数据库编程。与 core data 框架不同的是， sqlite 是使用程序式的， sql 的主要的 API 来直接操作数据表。 Core Data 不是一个关系型数据库，也不是关系型数据库管理系统 (RDBMS) 。虽然 Core Dta 支持SQLite 作为一种存储类型，但它不能使用任意的 SQLite 数据库。 Core Data 在使用的过程种自己创建这个数据库。 Core Data 支持对一、对多的关系。
+
+#### 112、UITableView 的重用机制？
+* UITableView 通过重用单元格来达到节省内存的目的: 通过为每个单元格指定一个重用标识符(reuseIdentifier),即指定了单元格的种类,以及当单元格滚出屏幕时,允许恢复单元格以便重用.对于不同种类的单元格使用不同的ID,对于简单的表格,一个标识符就够了。
+
+#### 113、lldb（gdb）常用的调试命令？
+* breakpoint 设置断点定位到某一个函数n 断点指针下一步po打印对象
+
+#### 114、如何调试BAD_ACCESS错误？
+* 1. 重写object的respondsToSelector方法，现实出现EXEC_BAD_ACCESS前访问的最后一个object 
+* 2. 通过 Zombie 
+* 3. 设置全局断点快速定位问题代码所在行
+* 4. Xcode 7 已经集成了BAD_ACCESS捕获功能：Address Sanitizer。 用法如下：在配置中勾选/Enable Address Sanitizer
+
+#### 115、IB中User Defined Runtime Attributes如何使用？
+* 它能够通过KVC的方式配置一些你在interface builder 中不能配置的属性。当你希望在IB中作尽可能多得事情，这个特性能够帮助你编写更加轻量级的viewcontroller
+
+#### 116、IBOutlet连出来的视图属性为什么可以被设置成weak?
+* 因为既然有外链那么视图在xib或者storyboard中肯定存在，视图已经对它有一个强引用了。不过这个回答漏了个重要知识，使用storyboard（xib不行）创建的vc，会有一个叫_topLevelObjectsToKeepAliveFromStoryboard的私有数组强引用所有top level的对象，所以这时即便outlet声明成weak也没关系
+
+#### 117、apple用什么方式实现对一个对象的KVO？
+* 当你观察一个对象时，一个新的类会被动态创建。这个类继承自该对象的原本的类，并重写了被观察属性的 setter 方法。重写的 setter 方法会负责在调用原 setter 方法之前和之后，通知所有观察对象：值的更改。最后通过 isa 混写（isa-swizzling） 把这个对象的 isa 指针 ( isa 指针告诉 Runtime 系统这个对象的类是什么 ) 指向这个新创建的子类，对象就神奇的变成了新创建的子类的实例。
+
+#### 118、KVC和KVO的keyPath一定是属性么？
+* KVO支持实例变量
+
+#### 119、KVC的keyPath中的集合运算符如何使用？
+* 1.必须用在集合对象上或普通对象的集合属性上2.简单集合运算符有@avg， @count ， @max ， @min ，@sum，3.格式 @"@sum.age"或 @"集合属性.@max.age"
+
+#### 120、若一个类有实例变量 NSString *_foo ，调用setValue:forKey:时，可以以foo还是 _foo 作为key？
+* 都可以
+
+#### 121、如何手动触发一个value的KVO？
+* 所谓的“手动触发”是区别于“自动触发”：自动触发是指类似这种场景：在注册 KVO 之前设置一个初始值，注册之后，设置一个不一样的值，就可以触发了。想知道如何手动触发，必须知道自动触发 KVO 的原理：键值观察通知依赖于 NSObject 的两个方法: willChangeValueForKey: 和 didChangevlueForKey: 。在一个被观察属性发生改变之前， willChangeValueForKey: 一定会被调用，这就 会记录旧的值。而当改变发生后， didChangeValueForKey: 会被调用，继而 observeValueForKey:ofObject:change:context: 也会被调用。如果可以手动实现这些调用，就可以实现“手动触发”了。那么“手动触发”的使用场景是什么？一般我们只在希望能控制“回调的调用时机”时才会这么做。具体做法如下：
+* 如果这个 value 是 表示时间的 self.now ，那么代码如下：最后两行代码缺一不可。
+* @property (nonatomic, strong) NSDate *now;
+* - (void)viewDidLoad{    [super viewDidLoad];    
+* [self willChangeValueForKey:@"now"];
+* “手动触发self.now的KVO”，必写。    
+* [self didChangeValueForKey:@"now"]; 
+* “手动触发self.now的KVO”，必写。
+* 但是平时我们一般不会这么干，我们都是等系统去“自动触发”。“自动触发”的实现原理：比如调用 setNow: 时，系统还会以某种方式在中间插入 wilChangeValueForKey: 、 didChangeValueForKey: 和 observeValueForKeyPath:ofObject:change:context: 的调用。大家可能以为这是因为 setNow: 是合成方法，有时候我们也能看到人们这么写代码:
+* - (void)setNow:(NSDate *)aDate {    [self willChangeValueForKey:@"now"]; 
+* 没有必要    _now = aDate;    [self didChangeValueForKey:@"now"];// 没有必要 } 这是完全没有必要的代码，不要这么做，这样的话，KVO代码会被调用两次。KVO在调用存取方法之前总是调用 willChangeValueForKey: ，之后总是调用 didChangeValueForkey: 。怎么做到的呢?答案是通过 isa 混写（isa-swizzling）
+
+#### 122、addObserver:forKeyPath:options:context:各个参数的作用分别是什么，observer中需要实现哪个方法才能获得KVO回调？
+* 添加键值观察
+* 1 观察者，负责处理监听事件的对象 
+* 2 观察的属性
+* 3 观察的选项
+* 4 上下文
+* [self.person addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:@"Person Name"];observer中需要实现一下方法： 所有的 kvo 监听到事件，都会调用此方法 
+* 1. 观察的属性 
+* 2. 观察的对象 
+* 3. change 属性变化字典（新／旧） 
+* 4. 上下文，与监听的时候传递的一致 
+* - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context;
+
+#### 123、以下代码运行结果如何？
+* -(void)viewDidLoad {    [super viewDidLoad];    NSLog(@"1");    
+
+* dispatch_sync(dispatch_get_main_queue(), ^{        NSLog(@\"2\");    });   NSLog(@\"3\");}
+* 只输出：1 。发生主线程锁死。
+
+#### 124、苹果为什么要废弃dispatch_get_current_queue？
+* dispatch_get_current_queue容易造成死锁
+
+#### 125、dispatch_barrier_async的作用是什么？
+* 在并行队列中，为了保持某些任务的顺序，需要等待一些任务完成后才能继续进行，使用 barrier 来等待之前任务完成，避免数据竞争等问题。 dispatch_barrier_async 函数会等待追加到Concurrent Dispatch Queue并行队列中的操作全部执行完之后，然后再执行 dispatch_barrier_async 函数追加的处理，等 dispatch_barrier_async 追加的处理执行结束之后，Concurrent Dispatch Queue才恢复之前的动作继续执行。打个比方：比如你们公司周末跟团旅游，高速休息站上，司机说：大家都去上厕所，速战速决，上完厕所就上高速。超大的公共厕所，大家同时去，程序猿很快就结束了，但程序媛就可能会慢一些，即使你第一个回来，司机也不会出发，司机要等待所有人都回来后，才能出发。 dispatch_barrier_async 函数追加的内容就如同 “上完厕所就上高速”这个动作。
+
+#### 126、如何用GCD同步若干个异步调用？（如根据若干个url异步加载多张图片，然后在都下载完成后合成一张整图）
+* 使用Dispatch Group追加block到Global Group Queue,这些block如果全部执行完毕，就会执行Main Dispatch Queue中的结束处理的block。dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+* dispatch_group_t group = dispatch_group_create();dispatch_group_async(group, queue, ^{ /*加载图片1 */ });
+* dispatch_group_async(group, queue, ^{ /*加载图片2 */ });
+* dispatch_group_async(group, queue, ^{ /*加载图片3 */ }); 
+* dispatch_group_notify(group, dispatch_get_main_queue(), ^{     // 合并图片});
+
+#### 127、GCD的队列（dispatch_queue_t）分哪两种类型？
+* 1.串行队列Serial Dispatch Queue 
+* 2.并行队列Concurrent Dispatch Queue
+
+#### 128、使用系统的某些block api（如UIView的block版本写动画时），是否也考虑引用循环问题？
+* "系统的某些block api中，UIView的block版本写动画时不需要考虑，但也有一些api 需要考虑：所谓“引用循环”是指双向的强引用，所以那些“单向的强引用”（block 强引用 self ）没有问题，比如这些： [UIView animateWithDuration:duration animations:^{ [self.superview layoutIfNeeded]; }]; [[NSOperationQueue mainQueue] addOperationWithBlock:^{ self.someProperty = xyz; }]; [[NSNotificationCenter defaultCenter] addObserverForName:@\"someNotification\"                                                  object:nil                           queue:[NSOperationQueue mainQueue]                                              usingBlock:^(NSNotification * notification) {                                                    self.someProperty = xyz; }];这些情况不需要考虑“引用循环”。但如果你使用一些参数中可能含有 ivar 的系统 api ，如 GCD 、NSNotificationCenter就要小心一点：比如GCD 内部如果引用了 self，而且 GCD 的其他参数是 ivar，则要考虑到循环引用： __weak __typeof__(self) weakSelf = self; dispatch_group_async(_operationsGroup, _operationsQueue, ^ { __typeof__(self) strongSelf = weakSelf;[strongSelf doSomething];[strongSelf doSomethingElse];} );类似的： __weak __typeof__(self) weakSelf = self;  _observer = [[NSNotificationCenter defaultCenter] addObserverForName:@\"testKey\"                                                                object:nil                                                                 queue:nil                                                            usingBlock:^(NSNotification *note) {      __typeof__(self) strongSelf = weakSelf;      [strongSelf dismissModalViewControllerAnimated:YES];  }];self --> _observer --> block --> self 显然这也是一个循环引用。"
+
+
+
+
+
+
+
+
+
+
 
 
 

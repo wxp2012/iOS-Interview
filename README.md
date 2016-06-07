@@ -715,7 +715,45 @@ int main(int argc, char * argv[]) {
 * 3）如果方法的返回值不是上述提到的几种情况，那么发送给nil的消息的返回值将是未定义的。具体原因如下： objc是动态语言，每个方法在运行时会被动态转为消息发送，即：objc_msgSend(receiver, selector)。
 
 #### 151、在有了自动合成属性实例变量之后，@synthesize还有哪些使用场景？
+* 回答这个问题前，我们要搞清楚一个问题，什么情况下不会autosynthesis（自动合成）？同时重写了setter和getter时重写了只读属性的getter时 使用了@dynamic时在 @protocol 中定义的所有属性 在 category 中定义的所有属性重载的属性当你在子类中重载了父类中的属性，你必须使用@synthesize来手动合成ivar。除了后三条，对其他几个我们可以总结出一个规律：当你想手动管理@property的所有内容时，你就会尝试通过实现@property的所有“存取方法”（the accessor methods）或者使用@dynamic来达到这个目的，这时编译器就会认为你打算手动管理@property，于是编译器就禁用了autosynthesis（自动合成）。因为有了autosynthesis（自动合成），大部分开发者已经习惯不去手动定义ivar，而是依赖于autosynthesis（自动合成），但是一旦你需要使用ivar，而autosynthesis（自动合成）又失效了，如果不去手动定义ivar，那么你就得借助@synthesize来手动合成ivar。
+
+#### 152、@synthesize合成实例变量的规则是什么？假如property名为foo，存在一个名为_foo的实例变量，那么还会自动合成新变量么？
+* 如果使用了属性的话，那么编译器就会自动编写访问属性所需的方法，此过程叫做“自动合成”( auto synthesis)。需要强调的是，这个过程由编译器在编译期执行，所以编辑器里看不到这些“合成方法” (synthesized method)的源代码。除了生成方法代码之外，编译器还要自动向类中添加适当类型的实例变量，并且在属性名前面加下划线，以此作为实例变量的名字。
+* @interface CYLPerson : NSObject 
+* @property NSString *firstName; 
+* @property NSString *lastName; 
+* @end
+* 在上例中，会生成两个实例变量，其名称分别为 _firstName与_lastName。也可以在类的实现代码里通过@synthesize语法来指定实例变量的名字: @implementation CYLPerson @synthesize firstName = _myFirstName; @synthesize lastName = _myLastName; @end上述语法会将生成的实例变量命名为_myFirstName与_myLastName，而不再使用默认的名字。一般情况下无须修改默认的实例变量名，但是如果你不喜欢以下划线来命名实例变量，那么可以用这个办法将其改为自己想要的名字。笔者还是推荐使用默认的命名方案，因为如果所有人都坚持这套方案，那么写出来的代码大家都能看得懂。
+* 总结下@synthesize合成实例变量的规则，有以下几点： 
+* 1）如果指定了成员变量的名称,会生成一个指定的名称的成员变量。 
+* 2）如果这个成员已经存在了就不再生成了。 
+* 3）如果是 @synthesize foo; 还会生成一个名称为foo的成员变量，也就是说：如果没有指定成员变量的名称会自动生成一个属性同名的成员变量。
+* 4）如果是 @synthesize foo = _foo; 就不会生成成员变量了.假如property名为foo，存在一个名为_foo的实例变量，那么还会自动合成新变量么？ 不会。
+
+#### 153、用@property声明的NSString（或NSArray，NSDictionary）经常使用copy关键字，为什么？如果改用strong关键字，可能造成什么问题？
+* 1）因为父类指针可以指向子类对象,使用copy的目的是为了让本对象的属性不受外界影响,使用copy无论给我传入是一个可变对象还是不可对象,我本身持有的就是一个不可变的副本。
+* 2）如果我们使用是strong,那么这个属性就有可能指向一个可变对象,如果这个可变对象在外部被修改了,那么会影响该属性. copy此特质所表达的所属关系与strong类似。然而设置方法并不保留新值，而是将其“拷贝” (copy)。 当属性类型为NSString时，经常用此特质来保护其封装性，因为传递给设置方法的新值有可能指向一个NSMutableString类的实例。这个类是NSString的子类，表示一种可修改其值的字符串，此时若是不拷贝字符串，那么设置完属性之后，字符串的值就可能会在对象不知情的情况下遭人更改。所以，这时就要拷贝一份“不可变” (immutable)的字符串，确保对象中的字符串值不会无意间变动。只要实现属性所用的对象是“可变的” (mutable)，就应该在设置新属性值时拷贝一份。为了理解这种做法，首先要知道，对非集合类对象的copy操作：在非集合类对象中：对immutable对象进行copy操作，是指针复制，mutableCopy操作时内容复制；对mutable对象进行copy和mutableCopy都是内容复制。用代码简单表示如下： [immutableObject copy]  浅复制 [immutableObject mutableCopy] //深复制 [mutableObject copy] //深复制[mutableObject mutableCopy] //深复制 比如以下代码： NSMutableString *string = [NSMutableString stringWithString:@"origin"];//copy  NSString *stringCopy = [string copy];查看内存，会发现 string、stringCopy 内存地址都不一样，说明此时都是做内容拷贝、深拷贝。即使你进行如下操作： 1 [string appendString:@"origion!"] stringCopy的值也不会因此改变，但是如果不使用copy，stringCopy的值就会被改变。 集合类对象以此类推。 所以，用@property声明 NSString、NSArray、NSDictionary 经常使用copy关键字，是因为他们有对应的可变类型：NSMutableString、NSMutableArray、NSMutableDictionary，他们之间可能进行赋值操作，为确保对象中的字符串值不会无意间变动，应该在设置新属性值时拷贝一份。
+
+#### 154、ARC下，不显式指定任何属性关键字时，默认的关键字都有哪些？
+* 对应基本数据类型默认关键字是atomic,readwrite,assign对于普通的OC对象atomic,readwrite,strong
+
+#### 155、@synthesize和@dynamic分别有什么作用？
+* 1）@property有两个对应的词，一个是@synthesize，一个是@dynamic。如果@synthesize和@dynamic都没写，那么默认的就是@syntheszie var = _var。
+* 2）@synthesize的语义是如果你没有手动实现setter方法和getter方法，那么编译器会自动为你加上这两个方法。
+* 3）@dynamic告诉编译器：属性的setter与getter方法由用户自己实现，不自动生成。（当然对于readonly的属性只需提供getter即可）。假如一个属性被声明为@dynamic var，然后你没有提供@setter方法和@getter方法，编译的时候没问题，但是当程序运行到instance.var = someVar，由于缺setter方法会导致程序崩溃；或者当运行到 someVar = var时，由于缺getter方法同样会导致崩溃。编译时没问题，运行时才执行相应的方法，这就是所谓的动态绑定。
+
+#### 156、weak属性需要在dealloc中置nil么？
+* 不需要。在ARC环境无论是强指针还是弱指针都无需在dealloc设置为nil，ARC会自动帮我们处理。即便是编译器不帮我们做这些，weak也不需要在dealloc中置nil：正如上文的：runtime 如何实现 weak 属性 中提到的：我们模拟下weak的setter方法，应该如下： 
+* -(void)setObject:(NSObject *)object{    objc_setAssociatedObject(self, "object", object, OBJC_ASSOCIATION_ASSIGN); [object cyl_runAtDealloc:^{       _object = nil;   }];}也即:在属性所指的对象遭到摧毁时，属性值也会清空(nil out)。
+
+#### 157、@property中有哪些属性关键字？@property 后面可以有哪些修饰符？
 * 
+
+
+
+
+
+
 
 
 

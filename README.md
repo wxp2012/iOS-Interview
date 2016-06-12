@@ -747,8 +747,26 @@ int main(int argc, char * argv[]) {
 * -(void)setObject:(NSObject *)object{    objc_setAssociatedObject(self, "object", object, OBJC_ASSOCIATION_ASSIGN); [object cyl_runAtDealloc:^{       _object = nil;   }];}也即:在属性所指的对象遭到摧毁时，属性值也会清空(nil out)。
 
 #### 157、@property中有哪些属性关键字？@property 后面可以有哪些修饰符？
-* 
+* 属性可以拥有的特质分为四类:原子性---nonatomic特质 在默认情况下，由编译器合成的方法会通过锁定机制确保其原子性(atomicity)。如果属性具备nonatomic特质，则不使用同步锁。请注意，尽管没有名为“atomic”的特质(如果某属性不具备nonatomic特质，那它就是“原子的” (atomic))，但是仍然可以在属性特质中写明这一点，编译器不会报错。若是自己定义存取方法，那么就应该遵从与属性特质相符的原子性。读/写权限---readwrite(读写)、readooly (只读) 内存管理语义---assign、strong、 weak、unsafe_unretained、copy方法名---getter=、setter=getter=的样式： 1  @property (nonatomic, getter=isOn) BOOL on;（ setter=这种不常用，也不推荐使用。故不在这里给出写法。）不常用的：nonnull,null_resettable,nullable
 
+#### 158、runtime 如何实现 weak 属性？
+* 要实现weak属性，首先要搞清楚weak属性的特点：weak 此特质表明该属性定义了一种“非拥有关系” (nonowning relationship)。为这种属性设置新值时，设置方法既不保留新值，也不释放旧值。此特质同assign类似， 然而在属性所指的对象遭到摧毁时，属性值也会清空(nil out)。那么runtime如何实现weak变量的自动置nil？runtime 对注册的类， 会进行布局，对于 weak 对象会放入一个 hash 表中。 用 weak 指向的对象内存地址作为 key，当此对象的引用计数为0的时候会 dealloc，假如 weak 指向的对象内存地址是a，那么就会以a为键， 在这个 weak 表中搜索，找到所有以a为键的 weak 对象，从而设置为 nil。
+
+#### 159、 @protocol 和 category 中如何使用 @property？
+* 1）在protocol中使用property只会生成setter和getter方法声明,我们使用属性的目的,是希望遵守我协议的对象能实现该属性
+* 2）category 使用 @property 也是只会生成setter和getter方法的声明,如果我们真的需要给category增加属性的实现,需要借助于运行时的两个函数：①objc_setAssociatedObject ②objc_getAssociatedObject
+
+#### 160、@property 的本质是什么？ivar、getter、setter 是如何生成并添加到这个类中的？
+* @property = ivar + getter + setter;下面解释下：“属性” (property)有两大概念：ivar（实例变量）、存取方法（access method ＝ getter + setter）。
+* “属性” (property)作为 Objective-C 的一项特性，主要的作用就在于封装对象中的数据。 Objective-C 对象通常会把其所需要的数据保存为各种实例变量。实例变量一般通过“存取方法”(access method)来访问。其中，“获取方法” (getter)用于读取变量值，而“设置方法” (setter)用于写入变量值。这个概念已经定型，并且经由“属性”这一特性而成为Objective-C 2.0的一部分。 而在正规的 Objective-C 编码风格中，存取方法有着严格的命名规范。 正因为有了这种严格的命名规范，所以 Objective-C 这门语言才能根据名称自动创建出存取方法。其实也可以把属性当做一种关键字，其表示:编译器会自动写出一套存取方法，用以访问给定类型中具有给定名称的变量。 所以你也可以这么说： @property = getter + setter; n例如下面这个类： @interface Person : NSObject @property NSString *firstName; @property NSString *lastName; @end
+* 上述代码写出来的类与下面这种写法等效：@interface Person : NSObject - (NSString *)firstName; - (void)setFirstName:(NSString *)firstName; - (NSString *)lastName; - (void)setLastName:(NSString *)lastName; @end ivar、getter、setter 是如何生成并添加到这个类中的?“自动合成”( autosynthesis)完成属性定义后，编译器会自动编写访问这些属性所需的方法，此过程叫做“自动合成”( autosynthesis)。需要强调的是，这个过程由编译 器在编译期执行，所以编辑器里看不到这些“合成方法”(synthesized method)的源代码。除了生成方法代码 getter、setter 之外，编译器还要自动向类中添加适当类型的实例变量，并且在属性名前面加下划线，以此作为实例变量的名字。在前例中，会生成两个实例变量，其名称分别为 _firstName与_lastName。也可以在类的实现代码里通过 @synthesize语法来指定实例变量的名字.@implementation Person @synthesize firstName = _myFirstName; @synthesize lastName = myLastName; @end我为了搞清属性是怎么实现的,曾经反编译过相关的代码,大致生成了五个东西：
+* 1）OBJC_IVAR_$类名$属性名称 ：该属性的“偏移量” (offset)，这个偏移量是“硬编码” (hardcode)，表示该变量距离存放对象的内存区域的起始地址有多远。
+* 2）setter与getter方法对应的实现函数3）ivar_list ：成员变量列表4）method_list ：方法列表5）prop_list ：属性列表也就是说我们每次在增加一个属性,系统都会在ivar_list中添加一个成员变量的描述,在method_list中增加setter与getter方法的描述,在属性列表中增加一个属性的描述,然后计算该属性在对象中的偏移量,然后给出setter与getter方法对应的实现,在setter方法中从偏移量的位置开始赋值,在getter方法中从偏移量开始取值,为了能够读取正确字节数,系统对象偏移量的指针类型进行了类型强转.
+
+#### 161、如何让自己的类用 copy 修饰符？如何重写带 copy 关键字的 setter？
+* 若想令自己所写的对象具有拷贝功能，则需实现NSCopying协议。如果自定义的对象分为可变版本与不可变版本，那么就要同时实现NSCopyiog与NSMutableCopying协议。具体步骤：
+* 1）需声明该类遵从NSCopying协议 
+* 2）实现NSCopying协议。该协议只有一个方法:- (id)copyWithZone: (NSZone*) zone注意：一提到让自己的类用 copy 修饰符，我们总是想覆写copy方法，其实真正需要实现的却是“copyWithZone”方法。
 
 
 

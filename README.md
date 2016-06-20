@@ -807,8 +807,102 @@ int main(int argc, char * argv[]) {
 * Blocks使用：int result = blk(10); 
 
 #### 167、const常量与宏定义区别？
-* (1) 编译器处理方式不同　define宏是在预处理阶段展开。const常量是编译运行阶段使用。
-* (2) 类型和安全检查不同  define宏没有类型，不做任何类型检查，仅仅是展开。　　const常量有具体的类型，在编译阶段会执行类型检查。
+* (1) 编译器处理方式不同　 define宏是在预处理阶段展开。const常量是编译运行阶段使用。
+* (2) 类型和安全检查不同    define宏没有类型，不做任何类型检查，仅仅是展开。　　const常量有具体的类型，在编译阶段会执行类型检查。
 * (3) 存储方式不同　　define宏仅仅是展开，有多少地方使用，就展开多少次，不会分配内存。　　const常量会在内存中分配(可以是堆中也可以是栈中)。
 * (4)const  可以节省空间，避免不必要的内存分配。 例如：  #define PI 3.14159 //常量宏          const doulbe Pi=3.14159; //此时并未将Pi放入ROM中 ......         double i=Pi; 此时为Pi分配内存，以后不再分配！         double I=PI; //编译期间进行宏替换，分配内存     double j=Pi; //没有内存分配        double J=PI; //再进行宏替换，又一次分配内存！   const定义常量从汇编的角度来看，只是给出了对应的内存地址，而不是象#define一样给出的是立即数，所以，const定义的常量在程序运行过程中只有一份拷贝，而 #define定义的常量在内存中有若干个拷贝。 
 * (5) 提高了效率。 编译器通常不为普通const常量分配存储空间，而是将它们保存在符号表中，这使得它成为一个编译期间的常量，没有了存储与读内存的操作，使得它的效率也很高。const 与 #define的比较    C++ 语言可以用const来定义常量，也可以用 #define来定义常量。但是前者比后者有更多的优点：（1）   const常量有数据类型，而宏常量没有数据类型。编译器可以对前者进行类型安全检查。而对后者只进行字符替换，没有类型安全检查，并且在字符替换可能会产生意料不到的错误（边际效应）。（2）   有些集成化的调试工具可以对const常量进行调试，但是不能对宏常量进行调试。
+
+#### 168、讲讲OC和其他语言好在哪里,不好在哪里？
+* Objc优点:    
+* 1)Cateogies    
+* 2) Posing    
+* 3) 动态识别    
+* 4) 指标计算    
+* 5)弹性讯息传递    
+* 6) 不是⼀个过度复杂的 C 衍⽣生语⾔言    
+* 7) Objective-C++ 与 C++ 可混合编程    
+* 缺点:    
+* 1) 不⽀支援命名空間    
+* 2) 不⽀支持运算符重载    
+* 3)不⽀支持多重继承
+
+#### 169、const的用法？
+* (1)欲阻止一个变量被改变,可以使用const关键字。在定义该const变量时,通常需要对它进行初始化,因为以后就没有机会再去改变它了;    
+* (2)对指针来说,可以指定指针本身为const,也可以指定指针所指的数据为const,或二者同时指定为const;   
+* (3)在一个函数声明中,const可以修饰形参,表明它是一个输入参数,在函数内部不能改变其值;   
+* (4)对于类的成员函数,若指定其为const类型,则表明其是一个常函数, 不能修改类的成员变量;    
+* (5)对于类的成员函数,有时候必须指定其返回值为const类型,以使得其 返回值不为“左值”。
+
+#### 170、把你知道的framework写出来，写出功能？
+* UIKit.framework 包含iOS应用程序用户界面层使用的类和方法，CoreGraphics.framework 包含Quartz 2D 绘图API 接口，Foundation.framework 为CoreFoundation 框架的许多功能提供Objective-C 封装，CoreFoundation.framework 一组C 语言接口,它们为iOS 应用程序提供基本数据管理和服务功能，MapKit.framework 该框架供一个可被嵌入到应用程序的地图界面,该界面包含一个可以滚动的地图视图，CoreLocation.framework 可用于定位某个设备当前经纬度，CFNetwork.framework提供一组高性能基于C 语言的接口,它们为使用网络协议提供面向对象抽象。
+
+#### 171、project workspace scheme的区别？
+* Project:⼀般的某个应⽤用单独新建⼀个project就可以了,然后把所有的程序⽂文件都放在⾥里⾯面,这个可以满⾜足⼤大部分普通的需求。   
+* Workspace:项目有可能要使⽤其他的项目文件,或者引入其他的静态库文件,这个时候workspace就派上用场了,workspace既可以单独管理多个项目,又可以通过配置,让各个项目相互依赖。    
+* Scheme:Xcode scheme定义了编译集合中的若干target,编译时的⼀些设置以及要执行的测试集合。可以自定义若干个scheme,但是同一时刻只能运⾏行⼀个。
+
+#### 172、SEL和一个函数指针调用同一个方法的结果是不是相同？
+* 得到了SEL变量之后,可以通过下面的调用来给一个对象发送消息:  [对象performSelector:SEL变量withObject:参数1 withObject:参数2];   
+* 结论:SEL只是⽅方法名标识,实际运⾏行时需要通过消息发送来调用,IMP是”implementation”的缩写,它是objetive-C 方法 (method)实现代码块的地址,类似函数指针,通过它可以 直接访问任意一个方法。免去发送消息的代价。
+
+#### 173、对于Objective-C，你认为它最大的优点和最大的不足是什么？对于不足之处，现在有没有可用的方法绕过这些不足来实现需求。如果可以的话，你有没有考虑或者实践过重新实现OC的一些功能，如果有，具体会如何做？
+* 最大的优点是它的运行时特性，不足是没有命名空间，对于命名冲突，可以使用长命名法或特殊前缀解决，如果是引入的第三方库之间的命名冲突，可以使用link命令及flag解决冲突。
+
+#### 174、是否做过异步的网络处理和通讯方面的工作？如果有，能具体介绍一些实现策略么？
+* 使用NSOperation发送异步网络请求，使用NSOperationQueue管理线程数目及优先级，底层是用NSURLConnetion。
+
+#### 175、使用GCD以及block时要注意些什么？它们两是一回事儿么？block在ARC中和传统的MRC中的行为和用法有没有什么区别，需要注意些什么？如何避免循环引用？
+* 使用block是要注意，若将block做函数参数时，需要把它放到最后，GCD是Grand Central Dispatch，是一个对线程开源类库，而Block是闭包，是能够读取其他函数内部变量的函数。
+
+#### 176、你用过NSOperationQueue么？如果用过或者了解的话，你为什么要使用NSOperationQueue，实现了什么？请描述它和GCD的区别和类似的地方？
+* 使用NSOperationQueue用来管理子类化的NSOperation对象，控制其线程并发数目。GCD和NSOperation都可以实现对线程的管理，区别是 NSOperation和NSOperationQueue是多线程的面向对象抽象。项目中使用NSOperation的优点是NSOperation是对线程的高度抽象，在项目中使用它，会使项目的程序结构更好，子类化NSOperation的设计思路，是具有面向对象的优点（复用、封装），使得实现是多线程支持，而接口简单，建议在复杂项目中使用。项目中使用GCD的优点是GCD本身非常简单、易用，对于不复杂的多线程操作，会节省代码量，而Block参数的使用，会是代码更为易读，建议在简单项目中使用。
+
+#### 177、NSNotification和KVO的区别和用法是什么？什么时候应该使用通知，什么时候应该使用KVO，它们的实现上有什么区别吗？如果用protocol和delegate（或者delegate的Array）来实现类似的功能可能吗？如果可能，会有什么潜在的问题？如果不能，为什么？
+* NSNotification是通知模式在iOS的实现，KVO的全称是键值观察(Key-value observing),其是基于KVC（key-value coding）的，KVC是一个通过属性名访问属性变量的机制。例如将Module层的变化，通知到多个Controller对象时，可以使用NSNotification；如果是只需要观察某个对象的某个属性，可以使用KVO。对于委托模式，在设计模式中是对象适配器模式，其是delegate是指向某个对象的，这是一对一的关系，而在通知模式中，往往是一对多的关系。委托模式，从技术上可以现在改变delegate指向的对象，但不建议这样做，会让人迷惑，如果一个delegate对象不断改变，指向不同的对象。
+
+#### 178、是否使用过CoreText或者CoreImage等？如果使用过，请谈谈你使用CoreText或者CoreImage的体验？
+* CoreText可以解决复杂文字内容排版问题。CoreImage可以处理图片，为其添加各种效果。体验是很强大，挺复杂的。
+
+#### 179、是否使用过CoreAnimation和CoreGraphics。UI框架和CA，CG框架的联系是什么？分别用CA和CG做过些什么动画或者图像上的内容？
+* UI框架的底层有CoreAnimation，CoreAnimation的底层有CoreGraphics。    UIKit | Core Animation | Core Graphics | Graphics Hardware|  使用CA做过menu菜单的展开收起
+
+#### 180、使用过Objective-C的运行时编程（Runtime Programming）么？如果使用过，你用它做了什么？你还能记得你所使用的相关的头文件或者某些方法的名称吗？
+* Objecitve-C的重要特性是Runtime（运行时）,在#import <objc/runtime.h> 下能看到相关的方法，用过objc_getClass()和class_copyMethodList()获取过私有API;使用 objective-c Method method1 = class_getInstanceMethod(cls, sel1);Method method2 = class_getInstanceMethod(cls, sel2); method_exchangeImplementations(method1, method2);  代码交换两个方法，在写unit test时使用到。
+
+#### 181、iOS 创建单例的两种方法(MRC ARC)？
+* MRC static AccountManager *DefaultManager = nil; 
++ (AccountManager *)defaultManager {      if (!DefaultManager) DefaultManager = [[self allocWithZone:NULL] init];      return DefaultManager;  }
+
+* ARC + (AccountManager *)sharedManager  {          static AccountManager *sharedAccountManagerInstance = nil;         static dispatch_once_t predicate;         dispatch_once(&predicate, ^{                  sharedAccountManagerInstance = [[self alloc] init];           });     return sharedAccountManagerInstance;  } 
+
+#### 182、写一个NSString类的实现
+* + (id)initWithCString:(c*****t char *)nullTerminatedCString encoding:(NSStringEncoding)encoding;
+* + (id) stringWithCString: (c*****t char*)nullTerminatedCString              encoding: (NSStringEncoding)encoding{  NSString  *obj;  obj = [self allocWithZone: NSDefaultMallocZone()];  obj = [obj initWithCString: nullTerminatedCString encoding: encoding];  return AUTORELEASE(obj);}
+
+#### 183、目标-动作机制是什么？
+* 目标是动作消息的接收者。一个控件，或者更为常见的是它的单元，以插座变量（参见\"插座变量\"部分）的形式保有其动作消息的目标。动作是控件发送给目标的消息，或者从目标的角度看，它是目标为了响应动作而实现的方法。程序需要某些机制来进行事件和指令的翻译。这个机制就是目标-动作机制。
+
+#### 184、什么是键-值,键路径是什么
+* 模型的性质是通过一个简单的键（通常是个字符串）来指定的。视图和控制器通过键来查找相应的属性值。在一个给定的实体中，同一个属性的所有值具有相同的数据类型。
+* 键-值编码技术用于进行这样的查找—它是一种间接访问对象属性的机制。
+* 键路径是一个由用点作分隔符的键组成的字符串，用于指定一个连接在一起的对象性质序列。第一个键的性质是由先前的性质决定的，接下来每个键的值也是相对于其前面的性质。键路径使您可以以独立于模型\r\n实现的方式指定相关对象的性质。通过键路径，您可以指定对象图中的一个任意深度的路径，使其指向相关对象的特定属性。
+
+#### 185、自动释放池是什么,如何工作
+* 当您向一个对象发送一个autorelease消息时，Cocoa就会将该对象的一个引用放入到最新的自动释放池。它仍然是个正当的对象，因此自动释放池定 义的作用域内的其它对象可以向它发送消息。当程序执行到作用域结束的位置时，自动释放池就会被释放，池中的所有对象也就被释放。
+* 1.  ojc-c 是 通过一种"referring counting"(引用计数)的方式来管理内存的, 对象在开始分配内存(alloc)的时候引用计数为一,以后每当碰到有copy,retain的时候引用计数都会加一, 每当碰到release和autorelease的时候引用计数就会减一,如果此对象的计数变为了0, 就会被系统销毁. 
+* 2. NSAutoreleasePool 就是用来做引用计数的管理工作的,这个东西一般不用你管的. 
+* 3. autorelease和release没什么区别,只是引用计数减一的时机不同而已,autorelease会在对象的使用真正结束的时候才做引用计数减一
+
+#### 186、方法和选择器有何不同？
+* selector是一个方法的名字，method是一个组合体，包含了名字和实现.
+
+#### 187、id、nil代表什么？
+* id和void *并非完全一样。在上面的代码中，id是指向struct objc_object的一个指针，这个意思基本上是说，id是一个指向任何一个继承了Object（或者NSObject）类的对象。需要注意的是id是一个指针，所以你在使用id的时候不需要加星号。比如id foo=nil定义了一个nil指针，这个指针指向NSObject的一个任意子类。而id *foo=nil则定义了一个指针，这个指针指向另一个指针，被指向的这个指针指向NSObject的一个子类。nil和C语言的NULL相同，在objc/objc.h中定义。nil表示一个Objctive-C对象，这个对象的指针指向空（没有东西就是空）。首字母大写的Nil和nil有一点不一样，Nil定义一个指向空的类（是Class，而不是对象）。SEL是“selector”的一个类型，表示一个方法的名字Method（我们常说的方法）表示一种类型，这种类型与selector和实现(implementation)相关IMP定义为 id (*IMP) (id, SEL, …)。这样说来， IMP是一个指向函数的指针，这个被指向的函数包括id(“self”指针)，调用的SEL（方法名），再加上一些其他参数.说白了IMP就是实现方法。
+
+#### 188、层和UIView的区别是什么？
+* 两者最大的区别是,图层不会直接渲染到屏幕上，UIView是iOS系统中界面元素的基础，所有的界面元素都是继承自它。它本身完全是由CoreAnimation来实现的。它真正的绘图部分，是由一个CALayer类来管理。UIView本身更像是一个CALayer的管理器。一个UIView上可以有n个CALayer，每个layer显示一种东西，增强UIView的展现能力。
+
+#### 189、APNS实现步骤
+* APNS 是Apple Push Notification Service（Apple Push服务器）的缩写，是苹果的服务器。第一阶段：.net应用程序把要发送的消息、目的iPhone的标识打包，发给APNS。第二阶段：APNS在自身的已注册Push服务的iPhone列表中，查找有相应标识的iPhone，并把消息发到iPhone。第三阶段：iPhone把发来的消息传递给相应的应用程序， 并且按照设定弹出Push通知。
+* <http://blog.csdn.net/zhuqilin0/article/details/6527113>    //消息推送机制

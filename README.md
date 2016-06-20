@@ -55,7 +55,8 @@
 
 #### 8、Objective-C如何对内存管理的，说说你的看法和解决方法？
 * Objective-C 的内存管理主要有三种方式ARC(自动引用计数)、手动内存计数、内存池。
-* 1). ARC(自动引用计数)：这种方式和java类似，在你的程序的执行过程中。始终有一个高人在背后准确地帮你收拾垃圾，你不用考虑它什么时候开始工作，怎样工作。你只需要明白，我申请了一段内存空间，当我不再使用从而这段内存成为垃圾的时候，我就彻底的把它忘记掉，反正那个高人会帮我收拾垃圾。遗憾的是，那个高人需要消耗一定的资源，在携带设备里面，资源是紧俏商品所以iPhone不支持这个功能。那么在自动引用计数下就没有内存泄漏问题了？这是完全错误的观点，在ARC下也还是会出现内存泄漏的问题。     解决: 通过alloc – initial方式创建的, 创建后引用计数+1, 此后每retain一次引用计数+1, 那么在程序中做相应次数的release就好了.
+* 1). ARC(自动引用计数)：这种方式和java类似，在你的程序的执行过程中。始终有一个高人在背后准确地帮你收拾垃圾，你不用考虑它什么时候开始工作，怎样工作。你只需要明白，我申请了一段内存空间，当我不再使用从而这段内存成为垃圾的时候，我就彻底的把它忘记掉，反正那个高人会帮我收拾垃圾。遗憾的是，那个高人需要消耗一定的资源，在携带设备里面，资源是紧俏商品所以iPhone不支持这个功能。那么在自动引用计数下就没有内存泄漏问题了？这是完全错误的观点，在ARC下也还是会出现内存泄漏的问题。     
+解决: 通过alloc – initial方式创建的, 创建后引用计数+1, 此后每retain一次引用计数+1, 那么在程序中做相应次数的release就好了.
 * 2). MRC(手动内存计数)：就是说，从一段内存被申请之后，就存在一个变量用于保存这段内存被使用的次数，我们暂时把它称为计数器，当计数器变为0的时候，那么就是释放这段内存的时候。比如说，当在程序A里面一段内存被成功申请完成之后，那么这个计数器就从0变成1(我们把这个过程叫做alloc)，然后程序B也需要使用这个内存，那么计数器就从1变成了2(我们把这个过程叫做retain)。紧接着程序A不再需要这段内存了，那么程序A就把这个计数器减1(我们把这个过程叫做release);程序B也不再需要这段内存的时候，那么也把计数器减1(这个过程还是release)。当系统(也就是Foundation)发现这个计数器变 成员了0，那么就会调用内存回收程序把这段内存回收(我们把这个过程叫做dealloc)。顺便提一句，如果没有Foundation，那么维护计数器，释放内存等等工作需要你手工来完成。 
 解决:一般是由类的静态方法创建的, 函数名中不会出现alloc或init字样, 如[NSString string]和[NSArray arrayWithObject:], 创建后引用计数+0, 在函数出栈后释放, 即相当于一个栈上的局部变量. 当然也可以通过retain延长对象的生存期.
 * 3). (NSAutoRealeasePool)内存池：可以通过创建和释放内存池控制内存申请和回收的时机.解决:是由autorelease加入系统内存池, 内存池是可以嵌套的, 每个内存池都需要有一个创建释放对, 就像main函数中写的一样. 使用也很简单, 比如[[[NSString alloc]initialWithFormat:@”Hey you!”] autorelease], 即将一个NSString对象加入到最内层的系统内存池, 当我们释放这个内存池时, 其中的对象都会被释放."
@@ -66,13 +67,20 @@
 
 #### 10、看下面的程序,第一个NSLog会输出什么?这时str的retainCount是多少?第二个和第三个呢? 为什么?
 * NSMutableArray* ary = [[NSMutableArray array] retain];
- NSString *str = [NSString stringWithFormat:@\"test\"];
-  [str retain];
- 
-[aryaddObject:str]; [str retain];
- [str release];
- [str release];  [aryremoveAllObjects];  str的retainCount创建+1，retain+1，加入数组自动+1 3 retain+1，release-1，release-1 2数组删除所有对象，所有数组内的对象自动-1 1
-#### 11、内存管理的几条原则时什么?按照默认法则。哪些关键字生成的对象需要手动释放?在和property结合的时候怎样有效的避免内存泄露?
+ NSString *str = [NSString stringWithFormat:@\"test\"];
+ 
+ [str retain];
+ 
+[aryaddObject:str];
+
+ [str retain];
+ [str release];
+ [str release];
+ 
+ [aryremoveAllObjects];
+ 
+ str的retainCount创建+1，retain+1，加入数组自动+1 3 retain+1，release-1，release-1 2数组删除所有对象，所有数组内的对象自动-1 1
+#### 11、内存管理的几条原则时什么?按照默认法则。哪些关键字生成的对象需要手动释放?在和property结合的时候怎样有效的避免内存泄露?
 * 谁申请，谁释放遵循Cocoa Touch的使用原则;内存管理主要要避免“过早释放”和“内存泄漏”，对于“过早释放”需要注意@property设置特性时，一定要用对特性关键字，对于“内存泄漏”，一定要申请了要负责释放，要细心。关键字alloc 或new 生成的对象需要手动释放;设置正确的property属性，对于retain需要在合适的地方释放
 
 #### 12、如何对iOS设备进行性能测试?
@@ -249,7 +257,8 @@ a = [customers filteredArrayUsingPredicate:predicate];
 * 多线程是个复杂的概念，按字面意思是同步完成多项任务，提高了资源的使用效率，从硬件、操作系统、应用软件不同的角度去看，多线程被赋予不同的内涵，对于硬件，现在市面上多数的CPU都是多核的，多核的CPU运算多线程更为出色;从操作系统角度，是多任务，现在用的主流操作系统都是多任务的，可以一边听歌、一边写博客;对于应用来说，多线程可以让应用有更快的回应，可以在网络下载时，同时响应用户的触摸操作。在iOS应用中，对多线程最初的理解，就是并发，它的含义是原来先做烧水，再摘菜，再炒菜的工作，会变成烧水的同时去摘菜，最后去炒菜。
 
 #### 53、iOS中的多线程有哪些？
-* iOS中的多线程，是Cocoa框架下的多线程，通过Cocoa的封装，可以让我们更为方便的使用线程，做过C++的同学可能会对线程有更多的理解，比如线程的创立，信号量、共享变量有认识，Cocoa框架下会方便很多，它对线程做了封装，有些封装，可以让我们创建的对象，本身便拥有线程，也就是线程的对象化抽象，从而减少我们的工程，提供程序的健壮性。GCD是(Grand Central Dispatch)的缩写 ，从系统级别提供的一个易用地多线程类库，具有运行时的特点，能充分利用多核心硬件。GCD的API接口为C语言的函数，函数参数中多数有Block，关于Block的使用参看这里，为我们提供强大的“接口”，对于GCD的使用参见本文NSOperation与QueueNSOperation是一个抽象类，它封装了线程的细节实现，我们可以通过子类化该对象，加上NSQueue来同面向对象的思维，管理多线程程序。具体可参看这里：一个基于NSOperation的多线程网络访问的项目。NSThread NSThread是一个控制线程执行的对象，它不如NSOperation抽象，通过它我们可以方便的得到一个线程，并控制它。但NSThread的线程之间的并发控制，是需要我们自己来控制的，可以通过NSCondition实现。参看 iOS多线程编程之NSThread的使用其他多线程在Cocoa的框架下，通知、Timer和异步函数等都有使用多线程)
+* iOS中的多线程，是Cocoa框架下的多线程，通过Cocoa的封装，可以让我们更为方便的使用线程，做过C++的同学可能会对线程有更多的理解，比如线程的创立，信号量、共享变量有认识，Cocoa框架下会方便很多，它对线程做了封装，有些封装，可以让我们创建的对象，本身便拥有线程，也就是线程的对象化抽象，从而减少我们的工程，提供程序的健壮性。GCD是(Grand Central Dispatch)的缩写 ，从系统级别提供的一个易用地多线程类库，具有运行时的特点，能充分利用多核心硬件。GCD的API接口为C语言的函数，函数参数中多数有Block，关于Block的使用参看这里，为我们提供强大的“接口”，对于GCD的使用参见本文NSOperation与Queue
+NSOperation是一个抽象类，它封装了线程的细节实现，我们可以通过子类化该对象，加上NSQueue来同面向对象的思维，管理多线程程序。具体可参看这里：一个基于NSOperation的多线程网络访问的项目。NSThread NSThread是一个控制线程执行的对象，它不如NSOperation抽象，通过它我们可以方便的得到一个线程，并控制它。但NSThread的线程之间的并发控制，是需要我们自己来控制的，可以通过NSCondition实现。参看 iOS多线程编程之NSThread的使用其他多线程在Cocoa的框架下，通知、Timer和异步函数等都有使用多线程)
 
 #### 54、在项目什么时候选择使用GCD，什么时候选择NSOperation?
 * 项目中使用NSOperation的优点是NSOperation是对线程的高度抽象，在项目中使用它，会使项目的程序结构更好，子类化NSOperation的设计思路，是具有面向对象的优点(复用、封装)，使得实现是多线程支持，而接口简单，建议在复杂项目中使用。项目中使用GCD的优点是GCD本身非常简单、易用，对于不复杂的多线程操作，会节省代码量，而Block参数的使用，会是代码更为易读，建议在简单项目中使用。
@@ -274,7 +283,9 @@ a = [customers filteredArrayUsingPredicate:predicate];
 
 #### 60、Object-C有私有方法吗？私有变量呢？
 * Objective-C – 类里面的方法只有两种, 静态方法和实例方法. 这似乎就不是完整的面向对象了,按照OO的原则就是一个对象只暴露有用的东西. 如果没有了私有方法的话, 对于一些小范围的代码重用就不那么顺手了. 在类里面声名一个私有方法
-* @interface Controller : NSObject { NSString *something; }+ (void)thisIsAStaticMethod;– (void)thisIsAnInstanceMethod;@end@interface Controller (private) -(void)thisIsAPrivateMethod;@end@private
+* @interface Controller : NSObject { NSString *something; }+ (void)thisIsAStaticMethod;– (void)thisIsAnInstanceMethod;
+@end
+@interface Controller (private) -(void)thisIsAPrivateMethod;@end@private
 * 可以用来修饰私有变量在Objective‐C中，所有实例变量默认都是私有的，所有实例方法默认都是公有的
 
 #### 61、内存管理 Autorelease、retain、copy、assign的set方法和含义？
@@ -785,7 +796,9 @@ int main(int argc, char * argv[]) {
 * 1）weak 此特质表明该属性定义了一种“非拥有关系” (nonowning relationship)。为这种属性设置新值时，设置方法既不保留新值，也不释放旧值。此特质同assign类似， 然而在属性所指的对象遭到摧毁时，属性值也会清空(nil out)。 而 assign 的“设置方法”只会执行针对“纯量类型” (scalar type，例如 CGFloat 或 NSlnteger 等)的简单赋值操作。
 * 2）assigin 可以用非OC对象,而weak必须用于OC对象
 
-
+#### 165、定义一个OC标准的枚举命令？
+* 官方示例1：typedef NS_ENUM(NSInteger, UITableViewCellStyle) {        UITableViewCellStyleDefault,        UITableViewCellStyleValue1,        UITableViewCellStyleValue2,       UITableViewCellStyleSubtitle};
+* 官方示例2：typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) {        UIViewAutoresizingNone        = 0,       UIViewAutoresizingFlexibleLeftMargin   = 1 << 0,       UIViewAutoresizingFlexibleWidth        = 1 << 1,        UIViewAutoresizingFlexibleRightMargin  = 1 << 2,        UIViewAutoresizingFlexibleTopMargin    = 1 << 3,        UIViewAutoresizingFlexibleHeight       = 1 << 4,        UIViewAutoresizingFlexibleBottomMargin = 1 << 5};
 
 
 

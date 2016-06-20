@@ -800,39 +800,15 @@ int main(int argc, char * argv[]) {
 * 官方示例1：typedef NS_ENUM(NSInteger, UITableViewCellStyle) {        UITableViewCellStyleDefault,        UITableViewCellStyleValue1,        UITableViewCellStyleValue2,       UITableViewCellStyleSubtitle};
 * 官方示例2：typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) {        UIViewAutoresizingNone        = 0,       UIViewAutoresizingFlexibleLeftMargin   = 1 << 0,       UIViewAutoresizingFlexibleWidth        = 1 << 1,        UIViewAutoresizingFlexibleRightMargin  = 1 << 2,        UIViewAutoresizingFlexibleTopMargin    = 1 << 3,        UIViewAutoresizingFlexibleHeight       = 1 << 4,        UIViewAutoresizingFlexibleBottomMargin = 1 << 5};
 
+#### 166、对比函数指针和Blocks使用方法？
+* 函数指针定义：int func (int count)( return count +1) ;  int (*funcptr)(int) = &func;
+* 函数指针使用：int result = (*funcptr)(10);
+* Blocks定义：int (^blk)(int) = ^(int count){return count+1;};
+* Blocks使用：int result = blk(10); 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### 165、 
+#### 167、const常量与宏定义区别？
+* (1) 编译器处理方式不同　define宏是在预处理阶段展开。const常量是编译运行阶段使用。
+* (2) 类型和安全检查不同  define宏没有类型，不做任何类型检查，仅仅是展开。　　const常量有具体的类型，在编译阶段会执行类型检查。
+* (3) 存储方式不同　　define宏仅仅是展开，有多少地方使用，就展开多少次，不会分配内存。　　const常量会在内存中分配(可以是堆中也可以是栈中)。
+* (4)const  可以节省空间，避免不必要的内存分配。 例如：  #define PI 3.14159 //常量宏          const doulbe Pi=3.14159; //此时并未将Pi放入ROM中 ......         double i=Pi; 此时为Pi分配内存，以后不再分配！         double I=PI; //编译期间进行宏替换，分配内存     double j=Pi; //没有内存分配        double J=PI; //再进行宏替换，又一次分配内存！   const定义常量从汇编的角度来看，只是给出了对应的内存地址，而不是象#define一样给出的是立即数，所以，const定义的常量在程序运行过程中只有一份拷贝，而 #define定义的常量在内存中有若干个拷贝。 
+* (5) 提高了效率。 编译器通常不为普通const常量分配存储空间，而是将它们保存在符号表中，这使得它成为一个编译期间的常量，没有了存储与读内存的操作，使得它的效率也很高。const 与 #define的比较    C++ 语言可以用const来定义常量，也可以用 #define来定义常量。但是前者比后者有更多的优点：（1）   const常量有数据类型，而宏常量没有数据类型。编译器可以对前者进行类型安全检查。而对后者只进行字符替换，没有类型安全检查，并且在字符替换可能会产生意料不到的错误（边际效应）。（2）   有些集成化的调试工具可以对const常量进行调试，但是不能对宏常量进行调试。

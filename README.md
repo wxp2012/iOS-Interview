@@ -980,4 +980,18 @@ int main(int argc, char * argv[]) {
 * 可以存图片，NSData存，但是我们一般不这样存，我们存路径把图片存在沙盒中
 
 #### 207、成员变量的作用域有几种？
-* 
+* @public，@protected，@private
+
+#### 208、OC中有私有成员变量吗？
+* 在.m文件中实现匿名类别Category
+
+#### 209、OC 中有私有方法吗?
+* 在.m 文件中实现 Category,只是在.m 中方法
+
+#### 210、解释关键字static、const、inline、 static inline、volatile
+* static 修饰变量表示静态变量,根据作用域 不同extern 和 static 是相反的。Static 修饰函数是表示函数在本文件有效Static inline 联合在一起表示内联函数。类似于宏Const 修饰变量和变量的内容只读Volatile 表示每次都从内存中真正的读取。主要是用于嵌入式中, 读取硬件。
+
+#### 211、什么是通知中心？
+* 通知中心是多对多的平等的通讯模式。主要用在多个对象之间松耦合的通讯模式。对象和对象之间通过通知的名字就可以进行关联通讯。
+
+#### 212、

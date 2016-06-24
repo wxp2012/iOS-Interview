@@ -994,4 +994,31 @@ int main(int argc, char * argv[]) {
 #### 211、什么是通知中心？
 * 通知中心是多对多的平等的通讯模式。主要用在多个对象之间松耦合的通讯模式。对象和对象之间通过通知的名字就可以进行关联通讯。
 
-#### 212、
+#### 212、什么是委托代理模式？
+* 委托代理是2个对象之间的一种通讯方式。一方使用协议,代理，另外一方实现协议,类似于回调,blocks 等语法，目的是为了软件设计的低耦合。
+
+#### 213、ScrollView的复用机制
+* 滚动过程中把 scrollview 里面的 超出屏幕的 view 放在重用队列中, 在滚动过程中如果有新的 view 进来,首先从重用队列中取得 view, 如果没有就新创建一个。
+
+#### 214、NSArray、NSDictionary这些是如何做的？
+* NSArray使用链表做的，NSDictionary使用hash表做的。
+
+#### 215、遍历数组的三种方式有什么区别？
+* for forin iterator forin 也叫快速循环。为什么他叫快速循环,原因是速度快?为什么速度快? 可以通过优化提前把 forin 里面的 array 数组数组全部导入到 cpu cache 中。因为 cache 访问速度把内存快至少 100 倍
+
+#### 216、HTTP协议、Socket协议的区别
+* HTTP 启动一个 NSUrlConnection 在 didFinish 长连接,长期的和服务器保持连接。目的是为了避免每次都要连接。因为和服务器连接的过程非常复杂。也耗时。所以连接一次。 HTTP 短连接只要处理完就断掉,下次重新连接 对服务器的负担小. 长连接对服务器压力很大。
+
+#### 217、怎么实现对象的本地存储
+* 归档 NSArchieve 使用NSKeyedArichiver进行归档、NSKeyedUnarchiver进行接档，这种方式会在写入、读出数据之前对数据进行序列化、反序列化操作。
+
+#### 218、copy和mutablecopy的区别
+* <http://www.xuebuyuan.com/1996263.html>
+
+#### 219、copy是深拷贝还是浅拷贝
+* copy 缺省是浅拷贝，但是 copy 也可以做成深拷贝
+
+#### 220、retain、copy、readonly、readwrite 的区别
+* retain对计数器+1 copy是创建一个新对象,readonly只产生getter 函数,readwrite 产生 setter, getter 函数
+
+#### 221、

@@ -1021,4 +1021,67 @@ int main(int argc, char * argv[]) {
 #### 220、retain、copy、readonly、readwrite 的区别
 * retain对计数器+1 copy是创建一个新对象,readonly只产生getter 函数,readwrite 产生 setter, getter 函数
 
-#### 221、
+#### 221、解释OC里的id类型
+* id 是泛型指针,可以指向任何 oc 类型,id =~ NSObject * ,id 是 objc_object 的 typedef,执行 Class 对象
+
+#### 222、本地存储方式有哪几种？
+* 数据库,NSUserDefauts, file , plist,archieve 归档 比较小的就放在 NSUserDefaults(以文件设计的存放在 Libraray 中) 数据库里面适合存放一条一条的记录 file 一般存普通文件,图片,视频,音频等plist 存放比 NSUserDefaults 大一些的 归档 NSArchieve 可以存对象
+
+#### 223、POST 和 GET 有何区别
+* GET 和 POST 都是 HTTP 请求方式的 2 中。POST 是安全的。GET 是不安全的。GET 是放在浏览器中地址暴露 出来了。POST 不会。但是在 App 上 GET 和 POST 都看不见。 GET 和 POST 都是和服务器提交参数/通讯的一种方式。GET 参数不能太长<1024B POST 没有限制<4G GET 不能上传文件, POST 可以上传文件。
+
+#### 224、POST 请求的链接参数怎么拼接？
+* POST 参数有 2 中,一种文件 POST 一种非文件 POST,对于非文 件 POST 格 式 ( form-data/x-www-urlencoded ) 是 name=xxx&id=22&sxx=33对于文件 POST(multiple/form-data)
+
+#### 225、C/C++和 OC 怎么混用
+* .m -> .mm
+
+#### 226、NSString *name = @”1000phone.com”,[name release]会出现什么情况
+* 这个代码不满足 objective-c 的内存管理黄金法则。没有 alloc 就release
+
+#### 227、什么是单例模式
+* 单例就是在多个对象之间共享数据,类似于全局变量,比如数据 库打开一次,多个界面都可以使用
+
+#### 228、解释KVC和KVO
+* Key value coding, Key value observer.KVC 是路径访问的规范,KVO 是观察某个变量的变化过程 KVO 可以观察某个对象的变量变化过程,KVC 是满足被观察的编 码规范。KVC/KVO 类似于代理,通知中心。都是一种通讯方法。
+
+#### 229、下拉刷新需要实现哪几个方法,刷新流程
+* 下拉刷新一般使用 EGORefresh 进行。原理是利用 scrollview 的反弹效果把刷新 view 加载在scrollview 的负坐标上。通过代理方法去触发。
+
+#### 230、如何调用 iOS 打电话,发短信
+* [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”tel://1543434”]]; * [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”sms://1572234”]]; * [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”mail://hello@hello.com”]];* [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”http://1000phone.net”]];
+#### 231、Objective-C 如何和 javascript 通讯
+* Objective-c javascript html 里面内容Objective-c 是通过 stringByEvaluatingJavaScriptFromString 函数 来执行 html 中的 javascript Javascript url objective-c 本地方法 需要通过 uiwebview 中的代理函数 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType;
+
+#### 232、怎么解析 HTML 源码
+* 一般 HTML 是通过 webview 来显示的。一般简单的 html 是通过 解析字符串来解析。没有成熟现成 html 解析器。 一般服务器去抓取html解析html形成json xml文件供手机端读取。
+
+#### 233、UITextField、UITextView 的区别
+* UITextField不能换行,UITextView可以换行。TextView可以点击字体放大,可以复制。相同的是他们都有代理类似
+
+#### 234、代理和通知中心/广播/NoficationCenter 什么区别
+* 代理主要是反向传值,一般用来 1:1 的两个对象通讯上。通知中心是通过注册然后接收事件的一种 n:n(多对多) 的方法
+
+#### 235、代理和协议什么区别
+* 代理是一种概念,协议是一种技术,代理是用协议来实现的,代理 是 2 个对象之间通讯的一种方式。 代理主要做反向传值的。实现系统的一些回调方法,比如 scrollview 滑动事件,选择照片,asi 网络下载完成等。
+
+#### 236、什么是异步
+* 相对于同步来说,单独起一个或者多线程去处理 异步是一个概念 线程还是一个技术,异步就是用线程这种技术 实现的 比如界面下载数据,我们启动一个异步任务 ASI 去网络下载数据, 然后异步刷新界面,我们无需等待网络数据下载完成。
+
+#### 237、解释多线程、NSThread 、NSOperation、GCD
+* 多线程在 iOS 用的很多,比如每个 asi 请求,sdwebimage 请求,数 据请求等待等网络数据处理,多线程/异步就是主要是为了界面流 畅,防止界面假死。每一个 ASI 请求就是一个 NSOperation每一个 NSUrlConnnection 也是一个线程 Nsthread 是创建线程的一个通用的类。比如线程创建,取消,开 始等。Nsoperation 就是一个简单的以任务为导向的多线程模型。目的是 为了不懂操作系统,不懂线程的人使用的GCD 类似于 NSOperation, 是一个 blocks 版本的线程模型。
+
+#### 238、C 和 OC 有哪些基本数据类型
+* C char, short, int, struct, union, enum NSString, nsarray, nsdictionary。
+
+#### 239、类别和继承什么区别
+* 类别/类目/Category 很方便给现有类添加方法。但是不能添加成员变量,匿名类除外,比如可以给 NSString 增加方法,给 UINavigationBar 增加方法,比如 SDWebImage 给 UIImageView 增 加了 setImageWithURL:方法。类别对于使用者很方便；  继承可以给现有的类增加方法和成员变量。继承对于使用者来 说不如类别方便 ,比如对 SDWebImage 如果用继承的话,那么就 需要写一个类似于 QFImageView 然后把所有的 UIImageView 改成QFImageView,这里不如类别方便
+
+#### 240、类别的作用
+* 类别是给已有的类添加方法,但是不能添加变量,匿名类别除外 ()
+
+#### 241、你如何理解复用机制
+* 一般是对 UIScrollview 做复用机制,因为 UIScrollview 滚动窗口没 有复用,所以要做,原理就是超过屏幕的 view 不能销毁,而要放 在复用队列/池里面存放起来,然后以后要在scrollview显示view 首先不要 alloc 创建,而要首先去复用池里面找有没有可复用的 view,如果没有就 alloc 如果有就直接用。
+
+#### 242、瀑布流怎么理解和实现的
+* 1. 如果简单的来说,用 3 个 tableview 就可以实现瀑布流,3 个 tableview 实现联动滚动。 2. 其实最好的做法在 scrollview 上使用 3 个复用队列,如果一种 一个 cell 超过屏幕,不能 release,而是把它回收到复用队列中, 如果要创建一个 cell,首先从复用队列中取一个,然后使用。

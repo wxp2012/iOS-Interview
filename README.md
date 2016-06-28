@@ -1085,3 +1085,29 @@ int main(int argc, char * argv[]) {
 
 #### 242、瀑布流怎么理解和实现的
 * 1. 如果简单的来说,用 3 个 tableview 就可以实现瀑布流,3 个 tableview 实现联动滚动。 2. 其实最好的做法在 scrollview 上使用 3 个复用队列,如果一种 一个 cell 超过屏幕,不能 release,而是把它回收到复用队列中, 如果要创建一个 cell,首先从复用队列中取一个,然后使用。
+
+#### 243、常见的点击手势有哪几种
+* UIPinchGuesture,UITapGuesture,UISwipGuesture,UILongPressGuesture, UIRotationGuesture"（捏合、点击、长按、旋转、滑动等）
+
+#### 244、界面之间传值有哪几种方法
+* 单例,代理,直接赋值,通知中心/广播, 数据库等多种，NSUserDefault，block
+
+#### 245、解释 TCP/IP 协议
+* TCP/IP 是网络开发中常见的传输协议,他传输和 udp 相比是可靠的。http 是基于 tcp/ip 的主要用户互联网的协议，所谓可靠是 tcp 传输对方会给一个 ACK 信号(确认信号) tcp 传输不如 udp 快,吞吐量不如 udp 大tcp 是顺序的,udp 是无序的；tcp 会保持连接,udp 不会保持连接
+
+#### 246、浅拷贝与深拷贝的区别或者什么是深拷贝什么是浅拷贝
+* copy, mutableCopy @interface A {B *b; } 浅拷贝只是拷贝对象本身,不会对里面的子对象进一步拷贝 深拷贝会对子对象以及子对象的子对象进一步拷贝
+
+#### 247、C语言里的数组与OC数组的区别
+* OC 数组是一个对象,有大量的方法（高度封装好的）,C 没有都需要自己写 C 数组删除是需要后面往前移动,OC 数组自动处理
+
+#### 248、你如何理解 iOS 内存管理
+* 1.new alloc copy retain这些对象我们都要主动的release或者 autorelease  
+* 2.如果是类方法创建的对象,那么系统自动释放池自动在适当的 时候会帮我们 release 
+* 3.ARC xcode 自动会帮我们人工智能的添加 release autorelease 操作
+
+#### 249、在项目什么时候选择使用GCD，什么时候选择NSOperation？
+* 项目中使用NSOperation的优点是NSOperation是对线程的高度抽象，在项目中使用它，会使项目的程序结构更好，子类化NSOperation的设计思路，是具有面向对象的优点（复用、 封装），使得实现是多线程支持，而接口简单，建议在复杂项目中使用。 项目中使用GCD的优点是GCD本身非常简单、易用，对于不复杂的多线程操作，会节省代码量，而Block参数的使用，会是代码更为易读，建议在简单项目中使用。
+
+#### 250、ASI 原理是什么?请举例来说明你平时用的那些文件？
+* ASI 使用apple底层 CFNetworking 框架实现的，而不是用 Socket 套接字实现的。他是一个基于NSOperation（抽象类）的线程处理网络框架 CFNetwork 是基于InputSteam / Outstream 流的方式管理数据，它内部使用了多线程异步模式进行数据的通讯，比如数据上传进度，下载进度，缓存的管理机制，大文件下载，大文件上传，安全机制。

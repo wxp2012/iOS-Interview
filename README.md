@@ -7,7 +7,7 @@
        
 #### 1、Object-C的类可以多重继承么？可以实现多个接口么？Category是什么？重写一个类的方式用继承好还是分类好？为什么？
 * 不能够实现多继承，这里延伸出来就是C++的知识，C++是支持多重继承的
-* 可以实现多个接口，通过实现多个接口可以完成类似于C++的多重继承功能
+* 可以实现多个接口，通过实现多个接口可以完成类似于C++的多重继承功能(protocol或者category)
 * Category是分类，或者说是类别
 * 用分类好，因为对分类去扩展实现方法，并不会对其他类与原有类的关系
 
@@ -115,7 +115,7 @@
 #### 16、类别的作用?继承和类别在实现中有何区别?
 * category 可以在不获悉，不改变原来代码的情况下往里面添加新的方法，只能添加，不能删除修改，并且如果类别和原来类中的方法产生名称冲突，则类别将覆盖原来的方法，因为类别具有更高的优先级。类别主要有3个作用： 
 * 1).将类的实现分散到多个不同文件或多个不同框架中。
-* 2).创建对私有方法的前向引用。
+* 2).创建对私有方法的前向引用(如果非要在其他类中调用私有方法，需要给MyClass类添加一个分类(Category)，在分类.h中写上该声明，分类.m中不用写实现。在要用的类中同时导入类.h和分类.h即可使用。这就是传说中的私有方法的前向引用。)。
 * 3).向对象添加非正式协议。继承可以增加，修改或者删除方法，并且可以增加属性。
 
 #### 17、类别和类扩展的区别？
@@ -294,7 +294,7 @@ NSOperation是一个抽象类，它封装了线程的细节实现，我们可以
 * 3).被传递(assign)的对象，你需要斟酌的retain和release。例如： obj2 = [[obj1 someMethod] autorelease];对象2接收对象1的一个自动释放的值，或传递一个基本数据类型(NSInteger，NSString)时：你或希望将对象2进行retain，以防止它在被使用之前就被自动释放掉。但是在retain后，一定要在适当的时候进行释放。关于索引计数(Reference Counting)的问题retain值 = 索引计数(Reference Counting) NSArray对象会retain(retain值加一)任何数组中的对象。当NSArray被卸载(dealloc)的时候，所有数组中的对象会 被 执行一次释放(retain值减一)。不仅仅是NSArray，任何收集类(Collection Classes)都执行类似操作。例如 NSDictionary，甚至UINavigationController。Alloc\/init建立的对象，索引计数为1。无需将其再次retain。 [NSArray array]和[NSDate date]等“方法”建立一个索引计数为1的对象，但是也是一个自动释放对象。所以是本地临时对象，那么无所谓了。如果是打算在全Class中使用的变量(iVar)，则必须retain它。缺省的类方法返回值都被执行了“自动释放”方法。(*如上中的NSArray)在类中的卸载方法“dealloc”中，release所有未被平衡的NS对象。(*所有未被autorelease，而retain值为1的)
 
 #### 62、Objective-C有多继承吗？没有的话用什么代替？cocoa 中所有的类都是NSObject 的子类
-* 多继承在这里是用protocol委托代理来实现的，你不用去考虑繁琐的多继承 ,虚基类的概念。ood的多态特性在Objective-C中通过委托来实现。
+* 多继承在这里是用protocol代理来实现的，你不用去考虑繁琐的多继承 ,虚基类的概念。ood的多态特性在Objective-C中通过委托来实现。
 
 #### 63、C和Objective-C如何混用?
 * 1).obj-c的编译器处理后缀为m的文件时，可以识别obj-c和c的代码，处理mm文件可以识别obj-c,c,c++代码，但cpp文件必须只能用c/c++代码，而且cpp文件include的头文件中，也不能出现obj-c的代码，因为cpp只是cpp 
@@ -1049,8 +1049,12 @@ int main(int argc, char * argv[]) {
 * 下拉刷新一般使用 EGORefresh 进行。原理是利用 scrollview 的反弹效果把刷新 view 加载在scrollview 的负坐标上。通过代理方法去触发。
 
 #### 230、如何调用 iOS 打电话,发短信
-* [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”tel://1543434”]]; * [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”sms://1572234”]]; * [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”mail://hello@hello.com”]];* [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”http://1000phone.net”]];
-#### 231、Objective-C 如何和 javascript 通讯
+* [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”tel://1543434”]]; 
+* [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”sms://1572234”]]; 
+* [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”mail://hello@hello.com”]];
+* [[UIApplication sharedApplication] openURL:[NSURL urlwithString:@”http://1000phone.net”]];
+
+#### 231、Objective-C 如何和 javascript 通讯
 * Objective-c javascript html 里面内容Objective-c 是通过 stringByEvaluatingJavaScriptFromString 函数 来执行 html 中的 javascript Javascript url objective-c 本地方法 需要通过 uiwebview 中的代理函数 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType;
 
 #### 232、怎么解析 HTML 源码
